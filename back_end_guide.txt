@@ -1,0 +1,62 @@
+Tuition Media Platform
+
+Tuition Media Platform is an online platform system where Users (students/parents) can search and apply for different tuitions, and Tutors can post and manage tuitions. The platform supports two types of users: Users and Tutors. Tutors can add, edit, or delete tuitions, while Users can search, filter, and apply for tuitions. The platform ensures seamless interaction between Users and Tutors, enabling Users to find the best tuitions and Tutors to manage their offerings effectively.
+
+You are required to implement the following features for this project:
+1. User Registration and Authentication (10 Marks)
+Features:
+Two roles: User (students/parents) and Tutor (tuition providers).
+Separate registration and login for Users and Tutors.
+Email verification for both roles.
+
+
+2. Add Tuition (10 Marks)
+Features:
+Only Tutors can add, edit, or delete tuition details.
+Tuition details include: title, description, class, subject, availability, etc.
+
+
+3. User and Tutor Profiles (10 Marks)
+Features:
+Display profile information for both Users and Tutors.
+Users can view their applied tuition history.
+Tutors can view their posted tuitions.
+Allow Users and Tutors to change their passwords.
+
+4. Filter (10 Marks)
+Features:
+Users can filter tuition by class, subject, or tutor.
+
+5. Apply for Tuition (15 Marks)
+Features:
+Users can apply for tuition by clicking an "Apply" button on the tuition details page.
+Tutors can view all applicants for their posted tuitions.
+Tutors can select an applicant for their tuition.
+Selected tuition is added to the applicant’s profile.
+
+6. Tuition Progress Tracking (15 Marks)
+Features:
+For Tutors:
+Tutors can track the progress of students enrolled in their tuition.
+Tutors can mark topics as completed and add assignments for students.
+For Users (Students):
+Students can view their progress in the tuition they are enrolled in.
+Progress includes:
+Completed topics.
+Assignments given by the tutor.
+
+7. Tuition Reviews (5 Marks)
+Features:
+Users can leave reviews for tuition.
+Reviews are only allowed after the user has been selected for the tuition.
+
+8. Deployment and Submit ( 5  Marks)
+Features:
+Deploy the application on a secure hosting platform 
+Submit the project with proper documentation.
+
+9. Future Payment Gateway Integration (Placeholder - Not Required Now)
+The system should be designed with the potential to support online payment for features such as:
+Tuition Fees: Users can pay tuition fees directly through the platform.
+Tutor Earnings: Tutors can receive payments for their tuition.
+Payment History: Users and Tutors can view their transaction history and invoices.
