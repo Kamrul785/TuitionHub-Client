@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router";
 import heroImage from "../../assets/hero_img.png";
-import BlurText from "../../animation/BlurText";
+import BlurText from "../Animations/BlurText";
 
 const handleAnimationComplete = () => {
   console.log("Animation completed!");
