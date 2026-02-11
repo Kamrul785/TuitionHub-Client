@@ -13,12 +13,12 @@ const Tuition = () => {
 
   const filteredTuitions = tuitions.filter((tuition) => {
     return (
-      (tuition.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tuition.description?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (tuition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tuition.description.toLowerCase().includes(searchTerm.toLowerCase())) &&
       (!filterSubject ||
-        tuition.subject?.toLowerCase().includes(filterSubject.toLowerCase())) &&
+        tuition.subject.toLowerCase().includes(filterSubject.toLowerCase())) &&
       (!filterClass ||
-        tuition.class_level?.toLowerCase().includes(filterClass.toLowerCase()))
+        tuition.class_level.toLowerCase().includes(filterClass.toLowerCase()))
     );
   });
 
@@ -27,12 +27,13 @@ const Tuition = () => {
       {/* Hero Section */}
       <section className="py-10 bg-white border-b border-blue-100">
         <div className="max-w-7xl mx-auto px-4 flex flex-col gap-2">
-          <p className="text-3xl uppercase tracking-[0.25em]  font-bold">            <ShinyText
+          <p className="text-3xl uppercase tracking-[0.25em] text-500 font-bold">
+            <ShinyText
               text="Browse Tuitions"
               speed={3}
               delay={0.5}
-              color="#3b25c1"
-              shineColor="#ffffff"
+              color="#18181b"
+              shineColor="#3b25c1"
               spread={120}
               direction="left"
               yoyo={false}

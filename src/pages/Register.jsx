@@ -270,6 +270,15 @@ const Register = () => {
               </a>
             </p>
           </div>
+          <div>
+            <p className="text-sm text-center mt-4">
+              Haven't received activation email?{" "}
+              <a href="/resend-activation" className="text-primary">
+                {" "}
+                Resend Activation Email
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -11,7 +11,7 @@ const ActivateAccount = () => {
   useEffect(() => {
     const activateAccount = async () => {
       try {
-        const response = await apiClient.post("/auth/users/activation/", {
+         await apiClient.post("/auth/users/activation/", {
           uid,
           token,
         });
@@ -30,7 +30,7 @@ const ActivateAccount = () => {
     activateAccount();
   }, []);
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-200 via-white to-blue-200">
+    <div className="min-h-screen flex items-center justify-center bg-leniar-to-r from-blue-200 via-white to-blue-200">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md text-center">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">
           Account Activation
