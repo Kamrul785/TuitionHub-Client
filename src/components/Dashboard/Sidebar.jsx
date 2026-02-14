@@ -1,4 +1,3 @@
-import React from "react";
 import {
   FiBarChart2,
   FiBookOpen,
@@ -32,8 +31,14 @@ const Sidebar = ({ role }) => {
       roles: ["Tutor"],
     },
     {
-      label: "Applicants",
+      label: "Applications",
       path: "/dashboard/applications",
+      icon: FiUsers,
+      roles: ["Tutor"],
+    },
+    {
+      label: "Enrollment",
+      path: "/dashboard/enrollment",
       icon: FiShoppingCart,
       roles: ["Tutor"],
     },

@@ -188,6 +188,212 @@ const useAuth = () => {
     localStorage.removeItem("authTokens");
   };
 
+  //Fetch Applications
+  const fetchApplications = async () => {
+    try {
+      const response = await apiClient.get("/applications/", {
+        headers: { Authorization: `JWT ${authTokens?.access}` },
+      });
+      return response.data;
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to fetch applications, Please Try again",
+      );
+    }
+  };
+
+  // Apply for Tuition
+  const applyForTuition = async (tuitionId) => {
+    try {
+      const response = await apiClient.post(
+        "/applications/",
+        { tuition: tuitionId },
+        {
+          headers: { Authorization: `JWT ${authTokens?.access}` },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to apply for tuition, Please Try again",
+      );
+    }
+  };
+
+  // Fetch Enrollments
+  const fetchEnrollments = async () => {
+    try {
+      const response = await apiClient.get("/enrollments/", {
+        headers: { Authorization: `JWT ${authTokens?.access}` },
+      });
+      return response.data;
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to fetch enrollments, Please Try again",
+      );
+    }
+  };
+
+  // Fetch single Enrollment
+  const fetchEnrollmentById = async (id) => {
+    try {
+      const response = await apiClient.get(`/enrollments/${id}/`, {
+        headers: { Authorization: `JWT ${authTokens?.access}` },
+      });
+      return response.data;
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to fetch enrollment details, Please Try again",
+      );
+    }
+  };
+
+  // Assignments
+  const fetchAssignments = async (enrollmentId) => {
+    try {
+      const response = await apiClient.get(
+        `/enrollments/${enrollmentId}/assignments/`,
+        {
+          headers: { Authorization: `JWT ${authTokens?.access}` },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to fetch assignments, Please Try again",
+      );
+    }
+  };
+
+  const createAssignment = async (enrollmentId, payload) => {
+    try {
+      const response = await apiClient.post(
+        `/enrollments/${enrollmentId}/assignments/`,
+        payload,
+        {
+          headers: { Authorization: `JWT ${authTokens?.access}` },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to create assignment, Please Try again",
+      );
+    }
+  };
+
+  const updateAssignment = async (enrollmentId, assignmentId, payload) => {
+    try {
+      const response = await apiClient.patch(
+        `/enrollments/${enrollmentId}/assignments/${assignmentId}/`,
+        payload,
+        {
+          headers: { Authorization: `JWT ${authTokens?.access}` },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to update assignment, Please Try again",
+      );
+    }
+  };
+
+  const deleteAssignment = async (enrollmentId, assignmentId) => {
+    try {
+      await apiClient.delete(
+        `/enrollments/${enrollmentId}/assignments/${assignmentId}/`,
+        {
+          headers: { Authorization: `JWT ${authTokens?.access}` },
+        },
+      );
+      return { success: true };
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to delete assignment, Please Try again",
+      );
+    }
+  };
+
+  // Topics
+  const fetchTopics = async (enrollmentId) => {
+    try {
+      const response = await apiClient.get(
+        `/enrollments/${enrollmentId}/topics/`,
+        {
+          headers: { Authorization: `JWT ${authTokens?.access}` },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      return handleApiError(error, "Failed to fetch topics, Please Try again");
+    }
+  };
+
+  const createTopic = async (enrollmentId, payload) => {
+    try {
+      const response = await apiClient.post(
+        `/enrollments/${enrollmentId}/topics/`,
+        payload,
+        {
+          headers: { Authorization: `JWT ${authTokens?.access}` },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      return handleApiError(error, "Failed to create topic, Please Try again");
+    }
+  };
+
+  const updateTopic = async (enrollmentId, topicId, payload) => {
+    try {
+      const response = await apiClient.patch(
+        `/enrollments/${enrollmentId}/topics/${topicId}/`,
+        payload,
+        {
+          headers: { Authorization: `JWT ${authTokens?.access}` },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      return handleApiError(error, "Failed to update topic, Please Try again");
+    }
+  };
+
+  const deleteTopic = async (enrollmentId, topicId) => {
+    try {
+      await apiClient.delete(
+        `/enrollments/${enrollmentId}/topics/${topicId}/`,
+        {
+          headers: { Authorization: `JWT ${authTokens?.access}` },
+        },
+      );
+      return { success: true };
+    } catch (error) {
+      return handleApiError(error, "Failed to delete topic, Please Try again");
+    }
+  };
+
+  // Select Application
+  const selectApplication = async (id, tuition) => {
+    try {
+      await apiClient.post(`/applications/${id}/select/`, tuition, {
+        headers: { Authorization: `JWT ${authTokens?.access}` },
+      });
+      console.log("Application accepted successfully.");
+    } catch (error) {
+      console.error("Error accepting application:", error);
+    }
+  };
+
   return {
     user,
     loginUser,
@@ -201,6 +407,19 @@ const useAuth = () => {
     resndActivationEmail,
     resetPasswordRequest,
     resetPasswordConfirm,
+    fetchApplications,
+    applyForTuition,
+    fetchEnrollments,
+    fetchEnrollmentById,
+    fetchAssignments,
+    createAssignment,
+    updateAssignment,
+    deleteAssignment,
+    fetchTopics,
+    createTopic,
+    updateTopic,
+    deleteTopic,
+    selectApplication,
   };
 };
 

@@ -17,6 +17,11 @@ import MyTuitions from "../components/Tuitions/MyTuitions";
 import EditTuition from "../components/Tuitions/EditTuition";
 import Tuition from "../components/Tuitions/Tuition";
 import TuitionDetails from "../components/Tuitions/TuitionDetails";
+import Applications from "../pages/Applications";
+import EnrollmentList from "../components/Enrollments/EnrollmentList";
+import EnrollmentDetails from "../components/Enrollments/EnrollmentDetails";
+import EnrollmentAssignments from "../components/Enrollments/EnrollmentAssignments";
+import EnrollmentTopics from "../components/Enrollments/EnrollmentTopics";
 
 const AppRoutes = () => {
   return (
@@ -31,7 +36,10 @@ const AppRoutes = () => {
         <Route path="/tuitions/:id" element={<TuitionDetails />} />
         <Route path="/activate/:uid/:token" element={<ActivateAccount />} />
         <Route path="/resend-activation" element={<ResendActivation />} />
-        <Route path="/password/reset/confirm/:uid/:token" element={<ResetPasswordConfirm />} />
+        <Route
+          path="/password/reset/confirm/:uid/:token"
+          element={<ResetPasswordConfirm />}
+        />
       </Route>
       <Route
         path="dashboard"
@@ -46,6 +54,17 @@ const AppRoutes = () => {
         <Route path="tuitions" element={<MyTuitions />} />
         <Route path="tuitions/new" element={<AddTuition />} />
         <Route path="tuitions/:id/edit" element={<EditTuition />} />
+        <Route path="applications" element={<Applications />} />
+        <Route path="enrollment" element={<EnrollmentList />} />
+        <Route path="enrollment/:id" element={<EnrollmentDetails />} />
+        <Route
+          path="enrollment/:id/assignments"
+          element={<EnrollmentAssignments />}
+        />
+        <Route
+          path="enrollment/:id/topics"
+          element={<EnrollmentTopics />}
+        />
       </Route>
     </Routes>
   );
