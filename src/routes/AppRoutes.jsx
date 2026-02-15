@@ -22,6 +22,11 @@ import EnrollmentList from "../components/Enrollments/EnrollmentList";
 import EnrollmentDetails from "../components/Enrollments/EnrollmentDetails";
 import EnrollmentAssignments from "../components/Enrollments/EnrollmentAssignments";
 import EnrollmentTopics from "../components/Enrollments/EnrollmentTopics";
+import StudentEnrollmentList from "../components/Enrollments/StudentEnrollmentList";
+import StudentEnrollmentDetails from "../components/Enrollments/StudentEnrollmentDetails";
+import StudentEnrollmentAssignments from "../components/Enrollments/StudentEnrollmentAssignments";
+import StudentEnrollmentTopics from "../components/Enrollments/StudentEnrollmentTopics";
+import StudentProgress from "../pages/StudentProgress";
 
 const AppRoutes = () => {
   return (
@@ -57,14 +62,13 @@ const AppRoutes = () => {
         <Route path="applications" element={<Applications />} />
         <Route path="enrollment" element={<EnrollmentList />} />
         <Route path="enrollment/:id" element={<EnrollmentDetails />} />
-        <Route
-          path="enrollment/:id/assignments"
-          element={<EnrollmentAssignments />}
-        />
-        <Route
-          path="enrollment/:id/topics"
-          element={<EnrollmentTopics />}
-        />
+        <Route path="enrollment/:id/assignments" element={<EnrollmentAssignments />} />
+        <Route path="enrollment/:id/topics" element={<EnrollmentTopics />}  />
+        <Route path="my-enrollments" element={<StudentEnrollmentList />} />
+        <Route path="my-enrollments/:id"  element={<StudentEnrollmentDetails />}  />
+        <Route path="my-enrollments/:id/assignments"  element={<StudentEnrollmentAssignments />}  />
+        <Route path="my-enrollments/:id/topics" element={<StudentEnrollmentTopics />}  />
+        <Route path="progress" element={<StudentProgress />} />
       </Route>
     </Routes>
   );

@@ -1,9 +1,9 @@
-import React from "react";
+import  { useState } from "react";
 import { FiCheckCircle, FiClock, FiXCircle } from "react-icons/fi";
 import useAuthContext from "../../hooks/useAuthContext";
 
 const ApplicationHistory = ({ applications, onApplicationUpdate }) => {
-  const [loading, setLoading] = React.useState(null); // Track which app is loading
+  const [loading, setLoading] = useState(null); 
   const { selectApplication } = useAuthContext();
 
   const formatDate = (isoString) => {
@@ -116,7 +116,16 @@ const ApplicationHistory = ({ applications, onApplicationUpdate }) => {
                           "Accept"
                         )}
                       </button>
-                      <button className="btn btn-error btn-xs">Reject</button>
+                      <button
+                        className="btn btn-error btn-xs"
+                        onClick={() => {
+                          /* TODO: Implement reject */
+                        }}
+                        disabled
+                        title="Coming soon"
+                      >
+                        Reject
+                      </button>{" "}
                     </div>
                   ) : (
                     <span className="text-sm text-slate-500">No action</span>

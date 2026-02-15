@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import useAuthContext from "../hooks/useAuthContext";
 
 const ResendActivation = () => {
-  const { resndActivationEmail, errorMsg, successMsg } = useAuthContext();
+  const { resendActivationEmail, errorMsg, successMsg } = useAuthContext();
   const {
     register,
     handleSubmit,
@@ -12,7 +12,7 @@ const ResendActivation = () => {
 
   const onSubmit = async (data) => {
     try {
-      await resndActivationEmail(data);
+      await resendActivationEmail(data);
     } catch (error) {
       console.error(error);
     }

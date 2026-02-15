@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import useAuthContext from "../../hooks/useAuthContext";
 
-const EnrollmentList = () => {
+const StudentEnrollmentList = () => {
   const { fetchEnrollments } = useAuthContext();
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,41 +10,32 @@ const EnrollmentList = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    let isMounted = true;
     const loadEnrollments = async () => {
       setLoading(true);
       setError("");
-      try {
-        const data = await fetchEnrollments();
-        if (!isMounted) return;
+      const data = await fetchEnrollments();
 
-        if (data?.success === false) {
-          setError(data.message || "Failed to fetch enrollments.");
-          setEnrollments([]);
-        } else {
-          setEnrollments(Array.isArray(data) ? data : []);
-        }
-      } catch (err) {
-        if (!isMounted) return;
-        setError(err.message || "Failed to fetch enrollments.");
+      if (data?.success === false) {
+        setError(data.message || "Failed to fetch enrollments.");
         setEnrollments([]);
-      } finally {
-        if (isMounted) setLoading(false);
+      } else {
+        console.log("Fetched enrollments:", Array.isArray(data));
+        setEnrollments(Array.isArray(data) ? data : []);
       }
+
+      setLoading(false);
     };
 
     loadEnrollments();
-    return () => {
-      isMounted = false;
-    };
   }, [fetchEnrollments]);
+
   const filteredEnrollments = useMemo(() => {
     if (!searchTerm) return enrollments;
     const keyword = searchTerm.toLowerCase();
     return enrollments.filter((item) => {
       const title = item.tuition_title?.toLowerCase() || "";
-      const student = item.student_email?.toLowerCase() || "";
-      return title.includes(keyword) || student.includes(keyword);
+      const tutor = item.tutor_email?.toLowerCase() || "";
+      return title.includes(keyword) || tutor.includes(keyword);
     });
   }, [enrollments, searchTerm]);
 
@@ -58,9 +49,9 @@ const EnrollmentList = () => {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-slate-800">Enrollments</h1>
+          <h1 className="text-3xl font-bold text-slate-800">My Enrollments</h1>
           <p className="text-slate-600 mt-1">
-            View students enrolled in your tuitions and manage progress.
+            View the tuitions you are enrolled in.
           </p>
         </div>
 
@@ -72,10 +63,12 @@ const EnrollmentList = () => {
               </h2>
               <input
                 type="text"
-                placeholder="Search by student email or tuition"
+                placeholder="Search by tuition or tutor"
                 className="input input-bordered input-sm w-full md:w-72"
                 value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
+                onChange={(event) => {
+                  setSearchTerm(event.target.value);
+                }}
               />
             </div>
 
@@ -92,26 +85,22 @@ const EnrollmentList = () => {
                   <thead className="bg-slate-50">
                     <tr>
                       <th>Tuition</th>
-                      <th>Student Email</th>
                       <th>Enrolled On</th>
                       <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredEnrollments.map((item) => (
+                    {filteredEnrollments.map((item) => (    
                       <tr key={item.id} className="hover:bg-slate-50">
                         <td className="font-medium text-slate-800">
                           {item.tuition_title}
-                        </td>
-                        <td className="text-slate-700">
-                          {item.student_email}
                         </td>
                         <td className="text-slate-500 text-sm">
                           {formatDate(item.enrolled_at)}
                         </td>
                         <td>
                           <Link
-                            to={`/dashboard/enrollment/${item.id}`}
+                            to={`/dashboard/my-enrollments/${item.id}`}
                             className="btn btn-primary btn-xs"
                           >
                             View Details
@@ -136,4 +125,4 @@ const EnrollmentList = () => {
   );
 };
 
-export default EnrollmentList;
+export default StudentEnrollmentList;

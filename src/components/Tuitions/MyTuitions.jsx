@@ -13,9 +13,9 @@ const MyTuitions = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
+    if (!user?.email) return;
     fetchTuitions();
   }, [user]);
-
   const fetchTuitions = async () => {
     setLoading(true);
     try {
@@ -27,7 +27,7 @@ const MyTuitions = () => {
       );
       setTuitions(myTuitions);
     } catch (error) {
-      setErrorMsg(error, "Failed to fetch tuitions");
+      setErrorMsg(error?.response?.data?.message || "Failed to fetch tuitions");
     } finally {
       setLoading(false);
     }
@@ -45,7 +45,7 @@ const MyTuitions = () => {
       setTuitions(tuitions.filter((t) => t.id !== id));
       setTimeout(() => setSuccessMsg(""), 3000);
     } catch (error) {
-      setErrorMsg(error, "Failed to delete tuition");
+      setErrorMsg(error?.response?.data?.message || "Failed to delete tuition");
       setTimeout(() => setErrorMsg(""), 3000);
     } finally {
       setDeleting(null);
@@ -53,7 +53,7 @@ const MyTuitions = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-slate-50 via-white to-slate-50 p-6">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

@@ -86,9 +86,7 @@ export default function Dashboard() {
           },
         ];
 
-  const activityTitle =
-    role === "Tutor" ? "Recent Applications" : "Recent Applications";
-  const activityColumns =
+  const activityTitle = "Recent Applications";  const activityColumns =
     role === "Tutor"
       ? ["Application ID", "Student", "Tuition", "Status", "Date"]
       : ["Application ID", "Tuition", "Tutor", "Status", "Date"];

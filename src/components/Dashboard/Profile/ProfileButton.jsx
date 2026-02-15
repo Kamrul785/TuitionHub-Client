@@ -24,13 +24,13 @@ const ProfileButton = ({ isEditing, setIsEditing, isLoading }) => {
             )}
           </button>
           <button
+            type="button"
             onClick={toggleEdit}
             className="btn btn-error"
             disabled={isLoading}
           >
             Cancel
-          </button>
-        </div>
+          </button>        </div>
       ) : (
         <button onClick={toggleEdit} className="btn btn-primary mt-6">
           Edit Profile

@@ -49,6 +49,12 @@ const Sidebar = ({ role }) => {
       roles: ["User"],
     },
     {
+      label: "My Enrollments",
+      path: "/dashboard/my-enrollments",
+      icon: FiBookOpen,
+      roles: ["User"],
+    },
+    {
       label: "Progress",
       path: "/dashboard/progress",
       icon: FiTag,

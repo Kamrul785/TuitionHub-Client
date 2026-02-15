@@ -119,7 +119,7 @@ const useAuth = () => {
   };
 
   // resend activation email
-  const resndActivationEmail = async (data) => {
+  const resendActivationEmail = async (data) => {
     setErrorMsg("");
     setSuccessMsg("");
     try {
@@ -186,6 +186,19 @@ const useAuth = () => {
     setAuthTokens(null);
     setUser(null);
     localStorage.removeItem("authTokens");
+  };
+
+  // Fetch tuitions
+  const fetchTuitions = async () => {
+    try {
+      const response = await apiClient.get("/tuitions/");
+      return response.data;
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to fetch tuitions, Please Try again",
+      );
+    }
   };
 
   //Fetch Applications
@@ -388,9 +401,12 @@ const useAuth = () => {
       await apiClient.post(`/applications/${id}/select/`, tuition, {
         headers: { Authorization: `JWT ${authTokens?.access}` },
       });
-      console.log("Application accepted successfully.");
+      setSuccessMsg("Application accepted successfully!");
     } catch (error) {
-      console.error("Error accepting application:", error);
+      setErrorMsg(
+        error.response?.data?.detail ||
+          "Failed to accept application, Please Try again",
+      );
     }
   };
 
@@ -404,9 +420,10 @@ const useAuth = () => {
     logoutUser,
     updateUserProfile,
     changePassword,
-    resndActivationEmail,
+    resendActivationEmail,
     resetPasswordRequest,
     resetPasswordConfirm,
+    fetchTuitions,
     fetchApplications,
     applyForTuition,
     fetchEnrollments,

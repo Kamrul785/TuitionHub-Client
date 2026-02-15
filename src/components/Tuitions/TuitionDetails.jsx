@@ -11,6 +11,7 @@ const TuitionDetails = () => {
   const [error, setError] = useState("");
   const [applicationStatus, setApplicationStatus] = useState(null);
   const [applying, setApplying] = useState(false);
+  const [checkApply, setCheckApply] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -20,7 +21,9 @@ const TuitionDetails = () => {
         const response = await apiClient.get(`/tuitions/${id}/`);
         setTuition(response.data);
       } catch (err) {
-        setError(err.response?.data?.detail || "Unable to load tuition details.");
+        setError(
+          err.response?.data?.detail || "Unable to load tuition details.",
+        );
       } finally {
         setLoading(false);
       }
@@ -33,17 +36,24 @@ const TuitionDetails = () => {
   useEffect(() => {
     const checkApplicationStatus = async () => {
       if (!user || !tuition) return;
-
-      const applicationsData = await fetchApplications();
-      if (Array.isArray(applicationsData)) {
-        const existingApp = applicationsData.find(
+      // console.log("Checking application status for user:", user.email);
+      setCheckApply(true);
+      try {
+        const applicationsData = await fetchApplications();
+        // console.log("Fetched applications:", applicationsData.results);
+        const existingApp = applicationsData.results.find(
           (app) => app.tuition === tuition.id,
         );
-        setApplicationStatus(existingApp || null);
         console.log("Existing application:", existingApp);
+        setApplicationStatus(existingApp || null);
+      } catch (err) {
+        setError(
+          err.response?.data?.detail || "Failed to check application status.",
+        );
+      } finally {
+        setCheckApply(false);
       }
     };
-
     checkApplicationStatus();
   }, [user, tuition, fetchApplications]);
 
@@ -193,7 +203,7 @@ const TuitionDetails = () => {
           <button
             className={`${getApplyButtonClass()} mt-6`}
             onClick={handleApply}
-            disabled={applying || !canApply}
+            disabled={applying || !canApply || checkApply}
           >
             {getApplyButtonContent()}
           </button>
