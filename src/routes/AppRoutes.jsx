@@ -27,6 +27,7 @@ import StudentEnrollmentDetails from "../components/Enrollments/StudentEnrollmen
 import StudentEnrollmentAssignments from "../components/Enrollments/StudentEnrollmentAssignments";
 import StudentEnrollmentTopics from "../components/Enrollments/StudentEnrollmentTopics";
 import StudentProgress from "../pages/StudentProgress";
+import Reviews from "../pages/Reviews";
 
 const AppRoutes = () => {
   return (
@@ -69,6 +70,7 @@ const AppRoutes = () => {
         <Route path="my-enrollments/:id/assignments"  element={<StudentEnrollmentAssignments />}  />
         <Route path="my-enrollments/:id/topics" element={<StudentEnrollmentTopics />}  />
         <Route path="progress" element={<StudentProgress />} />
+        <Route path="reviews" element={<Reviews />} />
       </Route>
     </Routes>
   );

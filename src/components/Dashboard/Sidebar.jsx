@@ -88,14 +88,9 @@ const Sidebar = ({ role }) => {
       <aside className="menu bg-white/95 backdrop-blur w-64 min-h-full p-4 text-base-content border-r border-slate-200">
         {/* Sidebar header */}
         <div className="flex items-center gap-3 mb-6 px-2">
-          {/* <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <FiBookOpen className="h-5 w-5" />
-          </span> */}
-          <div>
-            {/* <h1 className="text-lg font-bold">Tuition Hub</h1>
-            <p className="text-xs text-slate-500">Student success</p> */}
+          <a href="/">
             <img src={logo} alt="Tuition Hub Logo" />
-          </div>
+          </a>
         </div>
 
         {/* Sidebar menu */}

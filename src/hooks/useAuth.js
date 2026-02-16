@@ -395,6 +395,131 @@ const useAuth = () => {
     }
   };
 
+  // Reviews
+  const fetchTuitionReviews = async (tuitionId) => {
+    const headers = { Authorization: `JWT ${authTokens?.access}` };
+    try {
+      const response = await apiClient.get(`/reviews/`, { headers });
+      const data = Array.isArray(response.data)
+        ? response.data
+        : Array.isArray(response.data?.results)
+          ? response.data.results
+          : [];
+      return data.filter(
+        (review) =>
+          review.tuition === Number(tuitionId) ||
+          review.tuition_id === Number(tuitionId) ||
+          review.tuition?.id === Number(tuitionId),
+      );
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to fetch reviews, Please Try again",
+      );
+    }
+  };
+
+  const createTuitionReview = async (tuitionId, payload) => {
+    const headers = { Authorization: `JWT ${authTokens?.access}` };
+    try {
+      const response = await apiClient.post(
+        `/reviews/`,
+        { tuition: Number(tuitionId), ...payload },
+        { headers },
+      );
+      console.log("Review created successfully:", response.data);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error("Review creation error:", error.response?.data || error.message);
+      return handleApiError(
+        error,
+        "Failed to submit review, Please Try again",
+      );
+    }
+  };
+
+  const fetchMyReviews = async () => {
+    const headers = { Authorization: `JWT ${authTokens?.access}` };
+    try {
+      const response = await apiClient.get(`/reviews/`, { headers });
+      const data = Array.isArray(response.data)
+        ? response.data
+        : Array.isArray(response.data?.results)
+          ? response.data.results
+          : [];
+      if (!user) return data;
+      return data.filter(
+        (review) =>
+          review.user === user.id ||
+          review.user_email === user.email ||
+          review.reviewer_email === user.email,
+      );
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to fetch reviews, Please Try again",
+      );
+    }
+  };
+
+  const fetchTutorReviews = async () => {
+    const headers = { Authorization: `JWT ${authTokens?.access}` };
+    try {
+      const response = await apiClient.get(`/reviews/`, { headers });
+      const data = Array.isArray(response.data)
+        ? response.data
+        : Array.isArray(response.data?.results)
+          ? response.data.results
+          : [];
+      if (!user) return data;
+      return data.filter(
+        (review) =>
+          review.tutor === user.id ||
+          review.tutor_email === user.email ||
+          review.tutor?.email === user.email,
+      );
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to fetch reviews, Please Try again",
+      );
+    }
+  };
+
+  const updateTuitionReview = async (reviewId, payload) => {
+    const headers = { Authorization: `JWT ${authTokens?.access}` };
+    try {
+      const response = await apiClient.patch(
+        `/reviews/${reviewId}/`,
+        payload,
+        { headers },
+      );
+      console.log("Review updated successfully:", response.data);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error("Review update error:", error.response?.data || error.message);
+      return handleApiError(
+        error,
+        "Failed to update review, Please Try again",
+      );
+    }
+  };
+
+  const deleteTuitionReview = async (reviewId) => {
+    const headers = { Authorization: `JWT ${authTokens?.access}` };
+    try {
+      await apiClient.delete(`/reviews/${reviewId}/`, { headers });
+      console.log("Review deleted successfully");
+      return { success: true };
+    } catch (error) {
+      console.error("Review deletion error:", error.response?.data || error.message);
+      return handleApiError(
+        error,
+        "Failed to delete review, Please Try again",
+      );
+    }
+  };
+
   // Select Application
   const selectApplication = async (id, tuition) => {
     try {
@@ -436,6 +561,12 @@ const useAuth = () => {
     createTopic,
     updateTopic,
     deleteTopic,
+    fetchTuitionReviews,
+    createTuitionReview,
+    fetchMyReviews,
+    fetchTutorReviews,
+    updateTuitionReview,
+    deleteTuitionReview,
     selectApplication,
   };
 };
