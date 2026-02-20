@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import StarRating from "./StarRating";
+import { RiEdit2Fill } from "react-icons/ri";
+import { MdDelete } from "react-icons/md";
 
 const ReviewItem = ({ review, currentUserId, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -8,10 +10,7 @@ const ReviewItem = ({ review, currentUserId, onUpdate, onDelete }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const isOwner =
-    currentUserId === review.user ||
-    review.student_email === currentUserId ||
-    review.reviewer_email === currentUserId;
+  const isOwner = review.student_email === currentUserId;
 
   const handleSaveEdit = async () => {
     if (!editedRating) return;
@@ -31,7 +30,7 @@ const ReviewItem = ({ review, currentUserId, onUpdate, onDelete }) => {
     setIsDeleting(true);
     const result = await onDelete(review.id);
     if (result?.success) {
-      // Component will be removed by parent
+      alert("Review deleted successfully.");
     }
     setIsDeleting(false);
   };
@@ -92,31 +91,33 @@ const ReviewItem = ({ review, currentUserId, onUpdate, onDelete }) => {
               ? new Date(review.created_at).toLocaleDateString()
               : "-"}
           </span>
-          {isOwner && (
-            <div className="flex gap-1">
-              <button
-                className="btn btn-ghost btn-xs text-blue-600 hover:text-blue-700"
-                onClick={() => setIsEditing(true)}
-                title="Edit review"
-              >
-                ✎
-              </button>
-              <button
-                className="btn btn-ghost btn-xs text-red-600 hover:text-red-700"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                title="Delete review"
-              >
-                {isDeleting ? "..." : "✕"}
-              </button>
-            </div>
-          )}
         </div>
       </div>
-      <p className="text-slate-700">{review.comment || "No comment provided."}</p>
+      <p className="text-slate-700">
+        {review.comment || "No comment provided."}
+      </p>
       <p className="text-xs text-slate-500 mt-2">
         {review.student_email || review.reviewer_email || "Anonymous"}
       </p>
+      {isOwner && (
+        <div className="flex gap-1 mt-4">
+          <button
+            className="btn btn-ghost btn-sm text-blue-600 hover:text-blue-700"
+            onClick={() => setIsEditing(true)}
+            title="Edit review"
+          >
+            Edit <RiEdit2Fill />
+          </button>
+          <button
+            className="btn btn-ghost btn-sm text-red-600 hover:text-red-700"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            title="Delete review"
+          >
+            {isDeleting ? "Deleting..." : <MdDelete className="w-4 h-4" />}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
