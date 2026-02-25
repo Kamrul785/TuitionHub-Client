@@ -1,5 +1,6 @@
 import React from "react";
 import { FiSearch, FiMessageCircle, FiCheckCircle, FiCalendar, FiBookOpen, FiShield } from "react-icons/fi";
+import { Link } from "react-router";
 
 const steps = [
   {
@@ -93,8 +94,8 @@ const HowItWorks = () => {
               Browse tutors by subject and schedule your first session today. You can always message tutors before you book.
             </p>
             <div className="flex flex-wrap gap-3">
-              <LinkButton to="/tuitions" label="Browse tuitions" variant="primary" />
-              <LinkButton to="/register" label="Become a tutor" variant="outline" />
+              <Link to="/tuitions" className="btn btn-primary btn-sm">Browse Tuitions</Link>
+              <Link to="/register" className="btn btn-outline btn-sm">Register</Link>
             </div>
           </div>
         </section>
