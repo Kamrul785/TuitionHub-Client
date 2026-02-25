@@ -8,7 +8,7 @@ import "swiper/css/pagination";
 
 // import required modules
 import { FreeMode, Pagination } from "swiper/modules";
-import Card from "./card";
+import Card from "./Card";
 
 
 const Categories = () => {
