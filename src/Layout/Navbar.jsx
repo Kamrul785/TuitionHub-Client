@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
-import logo from "../assets/tuition_hub_logo.png";
+import logo from "../assets/Tuition_hub_logo.png";
 import useAuthContext from "../hooks/useAuthContext";
 const Navbar = () => {
   const { user, logoutUser } = useAuthContext();
