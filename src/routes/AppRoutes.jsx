@@ -28,6 +28,8 @@ import StudentEnrollmentAssignments from "../components/Enrollments/StudentEnrol
 import StudentEnrollmentTopics from "../components/Enrollments/StudentEnrollmentTopics";
 import StudentProgress from "../pages/StudentProgress";
 import Reviews from "../pages/Reviews";
+import HowItWorks from "../pages/HowItWorks";
+import FAQ from "../pages/FAQ";
 
 const AppRoutes = () => {
   return (
@@ -38,6 +40,8 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/products" element={<Products />} />
         <Route path="/about" element={<About />} />
+        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/faq" element={<FAQ />} />
         <Route path="/tuitions" element={<Tuition />} />
         <Route path="/tuitions/:id" element={<TuitionDetails />} />
         <Route path="/activate/:uid/:token" element={<ActivateAccount />} />
