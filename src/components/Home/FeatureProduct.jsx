@@ -1,34 +1,35 @@
 import React from 'react';
+import { FiAward, FiSearch, FiTrendingUp, FiStar, FiFileText, FiTarget } from 'react-icons/fi';
 
 const FeatureProduct = () => {
   const features = [
     {
-      icon: '🎓',
+      icon: FiAward,
       title: 'Expert Tutors',
       description: 'Learn from qualified and experienced tutors across all subjects',
     },
     {
-      icon: '🔍',
+      icon: FiSearch,
       title: 'Easy Search',
       description: 'Filter tuitions by class, subject, and tutor preferences',
     },
     {
-      icon: '📊',
+      icon: FiTrendingUp,
       title: 'Track Progress',
       description: 'Monitor your learning journey with detailed progress tracking',
     },
     {
-      icon: '💬',
+      icon: FiStar,
       title: 'Reviews & Ratings',
       description: 'Read honest reviews from students to make informed decisions',
     },
     {
-      icon: '📝',
+      icon: FiFileText,
       title: 'Assignments',
       description: 'Get assignments and practice materials from your tutor',
     },
     {
-      icon: '🎯',
+      icon: FiTarget,
       title: 'Personalized Learning',
       description: 'One-on-one attention tailored to your learning needs',
     },
@@ -53,7 +54,9 @@ const FeatureProduct = () => {
               className="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow"
             >
               <div className="card-body items-center text-center p-6">
-                <div className="text-5xl sm:text-6xl mb-4">{feature.icon}</div>
+                <div className="text-5xl sm:text-6xl mb-4 text-primary/80">
+                  <feature.icon className="inline h-12 w-12" />
+                </div>
                 <h3 className="card-title text-xl sm:text-2xl mb-2">{feature.title}</h3>
                 <p className="text-sm sm:text-base text-gray-600">
                   {feature.description}

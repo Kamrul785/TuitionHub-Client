@@ -1,4 +1,5 @@
 import React from "react";
+import { FiUserCheck, FiSend, FiBookOpen, FiUsers } from "react-icons/fi";
 import CountUp from "./CountUp";
 
 const State = () => {
@@ -10,7 +11,7 @@ const State = () => {
             <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-blue-200/30 blur-2xl" />
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-blue-600 text-white">
-                🎓
+                <FiUserCheck className="h-5 w-5" />
               </div>
               <div>
                 <div className="text-2xl sm:text-3xl font-semibold text-gray-900">
@@ -32,7 +33,7 @@ const State = () => {
             <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-emerald-200/30 blur-2xl" />
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-emerald-600 text-white">
-                📨
+                <FiSend className="h-5 w-5" />
               </div>
               <div>
                 <div className="text-2xl sm:text-3xl font-semibold text-gray-900">
@@ -54,7 +55,7 @@ const State = () => {
             <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-purple-200/30 blur-2xl" />
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-purple-600 text-white">
-                📚
+                <FiBookOpen className="h-5 w-5" />
               </div>
               <div>
                 <div className="text-2xl sm:text-3xl font-semibold text-gray-900">
@@ -76,7 +77,7 @@ const State = () => {
             <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-orange-200/30 blur-2xl" />
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-orange-600 text-white">
-                🤝
+                <FiUsers className="h-5 w-5" />
               </div>
               <div>
                 <div className="text-2xl sm:text-3xl font-semibold text-gray-900">
