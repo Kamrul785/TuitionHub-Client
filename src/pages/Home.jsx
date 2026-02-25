@@ -2,8 +2,8 @@ import React from "react";
 import Hero from "../components/Home/Hero";
 import FeatureProduct from "../components/Home/FeatureProduct";
 import State from "../components/Home/State";
-import Work from "../components/Home/work"
-import Categories from "../components/categories/Categories";
+import Work from "../components/Home/Work";
+import Categories from "../components/Categories/Categories";
 
 const Home = () => {
   return (
