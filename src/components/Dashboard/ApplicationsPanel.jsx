@@ -1,4 +1,47 @@
-const ApplicationsPanel = ({ role, activityTitle, activityColumns }) => {
+import { useEffect, useState } from "react";
+import apiClient from "../../services/api-client";
+
+const ApplicationsPanel = ({ role, activityTitle, activityColumns, applications = [] }) => {
+  const [tuitionTutorMap, setTuitionTutorMap] = useState({});
+  const getStatusColor = (status) => {
+    switch (status?.toUpperCase()) {
+      case "PENDING":
+        return { border: "border-warning", text: "text-warning" };
+      case "ACCEPTED":
+        return { border: "border-success", text: "text-success" };
+      case "REJECTED":
+        return { border: "border-error", text: "text-error" };
+      default:
+        return { border: "border-slate-300", text: "text-slate-600" };
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  useEffect(() => {
+    const fetchTuitionTutors = async () => {
+      try {
+        const response = await apiClient.get("/tuitions/");
+        const tuitions = response.data?.results || response.data || [];
+        const map = tuitions.reduce((acc, tuition) => {
+          acc[tuition.id] = tuition.tutor_email || "-";
+          return acc;
+        }, {});
+        setTuitionTutorMap(map);
+      } catch (error) {
+        setTuitionTutorMap({});
+      }
+    };
+
+    fetchTuitionTutors();
+  }, []);
 
   return (
     <div className="mt-6 card bg-white/90 backdrop-blur shadow-sm border border-slate-200">
@@ -31,78 +74,53 @@ const ApplicationsPanel = ({ role, activityTitle, activityColumns }) => {
               </tr>
             </thead>
             <tbody>
-              {role === "Tutor" ? (
-                <>
-                  <tr>
-                    <td>#APP-2042</td>
-                    <td>John Smith</td>
-                    <td>Physics (Class 9)</td>
-                    <td>
-                      <div className="border border-warning w-1/2 rounded-2xl text-center text-warning">
-                        PENDING
-                      </div>
-                    </td>
-                    <td>Feb 9, 2026</td>
-                  </tr>
-                  <tr>
-                    <td>#APP-2037</td>
-                    <td>Sarah Johnson</td>
-                    <td>Math (Class 10)</td>
-                    <td>
-                      <div className="border border-success w-1/2 rounded-2xl text-center text-success">
-                        ACCEPTED
-                      </div>
-                    </td>
-                    <td>Feb 8, 2026</td>
-                  </tr>
-                  <tr>
-                    <td>#APP-2033</td>
-                    <td>Michael Brown</td>
-                    <td>English (Class 8)</td>
-                    <td>
-                      <div className="border border-error w-1/2 rounded-2xl text-center text-error">
-                        REJECTED
-                      </div>
-                    </td>
-                    <td>Feb 7, 2026</td>
-                  </tr>
-                </>
+              {applications && applications.length > 0 ? (
+                applications.map((app) => {
+                  const statusColor = getStatusColor(app.status);
+                  return (
+                    <tr key={app.id} className="hover:bg-slate-50">
+                      {role === "Tutor" ? (
+                        <>
+                          <td className="font-semibold">#{app.id}</td>
+                          <td>{app.applicant_email  || "-"}</td>
+                          <td>{app.tuition_title ||  "-"}</td>
+                          <td>
+                            <div
+                              className={`border ${statusColor.border} w-fit rounded-full px-3 py-1 text-center text-sm font-medium ${statusColor.text}`}
+                            >
+                              {app.status || "-"}
+                            </div>
+                          </td>
+                          <td>{formatDate(app.applied_at)}</td>
+                        </>
+                      ) : (
+                        <>
+                          <td className="font-semibold">#{app.id}</td>
+                          <td>{app.tuition_title ||  "-"}</td>
+                          <td>
+                            {typeof app.tuition === "object"
+                              ? app.tuition?.tutor_email || "-"
+                              : tuitionTutorMap[app.tuition] || "-"}
+                          </td>
+                          <td>
+                            <div
+                              className={`border ${statusColor.border} w-fit rounded-full px-3 py-1 text-center text-sm font-medium ${statusColor.text}`}
+                            >
+                              {app.status || "-"}
+                            </div>
+                          </td>
+                          <td>{formatDate(app.applied_at)}</td>
+                        </>
+                      )}
+                    </tr>
+                  );
+                })
               ) : (
-                <>
-                  <tr>
-                    <td>#APP-1042</td>
-                    <td>Physics (Class 9)</td>
-                    <td>Sara Collins</td>
-                    <td>
-                      <div className="border border-warning w-1/2 rounded-2xl text-center text-warning">
-                        PENDING
-                      </div>
-                    </td>
-                    <td>Feb 9, 2026</td>
-                  </tr>
-                  <tr>
-                    <td>#APP-1037</td>
-                    <td>Math (Class 10)</td>
-                    <td>Daniel Green</td>
-                    <td>
-                      <div className="border border-success w-1/2 rounded-2xl text-center text-success">
-                        ACCEPTED
-                      </div>
-                    </td>
-                    <td>Feb 8, 2026</td>
-                  </tr>
-                  <tr>
-                    <td>#APP-1033</td>
-                    <td>English (Class 8)</td>
-                    <td>Ivy Hart</td>
-                    <td>
-                      <div className="border border-error w-1/2 rounded-2xl text-center text-error">
-                        REJECTED
-                      </div>
-                    </td>
-                    <td>Feb 7, 2026</td>
-                  </tr>
-                </>
+                <tr>
+                  <td colSpan={activityColumns.length} className="text-center text-slate-500 py-8">
+                    No applications found
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

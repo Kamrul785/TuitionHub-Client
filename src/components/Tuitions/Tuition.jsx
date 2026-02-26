@@ -32,8 +32,8 @@ const Tuition = () => {
               text="Browse Tuitions"
               speed={3}
               delay={0.5}
-              color="#18181b"
-              shineColor="#3b25c1"
+              color="#3b25c1"
+              shineColor="#ffffff"
               spread={120}
               direction="left"
               yoyo={false}

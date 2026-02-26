@@ -274,6 +274,7 @@ const useAuth = () => {
           headers: { Authorization: `JWT ${authTokens?.access}` },
         },
       );
+      console.log("Fetched assignments:", response.data);
       return response.data;
     } catch (error) {
       return handleApiError(
