@@ -132,7 +132,7 @@ const Reviews = () => {
                     </div>
                     <div className="text-xs text-slate-500">
                       <span className="font-medium">Reviewer:</span>{" "}
-                      {review.user_email || review.reviewer_email || "Anonymous"}
+                      {review.student_email || "Anonymous"}
                     </div>
                   </div>
                 ))}

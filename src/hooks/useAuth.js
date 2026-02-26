@@ -412,10 +412,7 @@ const useAuth = () => {
           review.tuition?.id === Number(tuitionId),
       );
     } catch (error) {
-      return handleApiError(
-        error,
-        "Failed to fetch reviews, Please Try again",
-      );
+      return handleApiError(error, "Failed to fetch reviews, Please Try again");
     }
   };
 
@@ -430,11 +427,11 @@ const useAuth = () => {
       console.log("Review created successfully:", response.data);
       return { success: true, data: response.data };
     } catch (error) {
-      console.error("Review creation error:", error.response?.data || error.message);
-      return handleApiError(
-        error,
-        "Failed to submit review, Please Try again",
+      console.error(
+        "Review creation error:",
+        error.response?.data || error.message,
       );
+      return handleApiError(error, "Failed to submit review, Please Try again");
     }
   };
 
@@ -447,17 +444,17 @@ const useAuth = () => {
         : Array.isArray(response.data?.results)
           ? response.data.results
           : [];
+
       if (!user) return data;
-      return data.filter(
-        (review) =>
-          review.user === user.id ||
-          review.user_email === user.email ||
-          review.reviewer_email === user.email,
-      );
+
+      // Filter reviews written by the current user (student)
+      // Use student_email field from the Review schema
+
+      return data.filter((review) => review.student_email === user.email);
     } catch (error) {
       return handleApiError(
         error,
-        "Failed to fetch reviews, Please Try again",
+        "Failed to fetch your reviews, Please Try again",
       );
     }
   };
@@ -465,23 +462,34 @@ const useAuth = () => {
   const fetchTutorReviews = async () => {
     const headers = { Authorization: `JWT ${authTokens?.access}` };
     try {
-      const response = await apiClient.get(`/reviews/`, { headers });
-      const data = Array.isArray(response.data)
-        ? response.data
-        : Array.isArray(response.data?.results)
-          ? response.data.results
+      // Fetch all reviews
+      const reviewsResponse = await apiClient.get(`/reviews/`, { headers });
+      const allReviews = Array.isArray(reviewsResponse.data)
+        ? reviewsResponse.data
+        : Array.isArray(reviewsResponse.data?.results)
+          ? reviewsResponse.data.results
           : [];
-      if (!user) return data;
-      return data.filter(
-        (review) =>
-          review.tutor === user.id ||
-          review.tutor_email === user.email ||
-          review.tutor?.email === user.email,
+      if (!user) return allReviews;
+
+      // Fetch all tuitions to get tutor information
+      // Review.tuition is just an integer ID, not an expanded object
+      const tuitionsResponse = await apiClient.get("/tuitions/");
+      const allTuitions =
+        tuitionsResponse.data.results || tuitionsResponse.data || [];
+
+      // Get IDs of tuitions owned by current tutor
+      const myTuitionIds = allTuitions
+        .filter((tuition) => tuition.tutor_email === user.email)
+        .map((tuition) => tuition.id);
+
+      // Filter reviews that belong to tutor's tuitions
+      return allReviews.filter((review) =>
+        myTuitionIds.includes(review.tuition),
       );
     } catch (error) {
       return handleApiError(
         error,
-        "Failed to fetch reviews, Please Try again",
+        "Failed to fetch tuition reviews, Please Try again",
       );
     }
   };
@@ -489,19 +497,12 @@ const useAuth = () => {
   const updateTuitionReview = async (reviewId, payload) => {
     const headers = { Authorization: `JWT ${authTokens?.access}` };
     try {
-      const response = await apiClient.patch(
-        `/reviews/${reviewId}/`,
-        payload,
-        { headers },
-      );
-      console.log("Review updated successfully:", response.data);
+      const response = await apiClient.patch(`/reviews/${reviewId}/`, payload, {
+        headers,
+      });
       return { success: true, data: response.data };
     } catch (error) {
-      console.error("Review update error:", error.response?.data || error.message);
-      return handleApiError(
-        error,
-        "Failed to update review, Please Try again",
-      );
+      return handleApiError(error, "Failed to update review, Please Try again");
     }
   };
 
@@ -509,14 +510,10 @@ const useAuth = () => {
     const headers = { Authorization: `JWT ${authTokens?.access}` };
     try {
       await apiClient.delete(`/reviews/${reviewId}/`, { headers });
-      console.log("Review deleted successfully");
+      
       return { success: true };
     } catch (error) {
-      console.error("Review deletion error:", error.response?.data || error.message);
-      return handleApiError(
-        error,
-        "Failed to delete review, Please Try again",
-      );
+      return handleApiError(error, "Failed to delete review, Please Try again");
     }
   };
 
