@@ -1,13 +1,16 @@
 import React from "react";
+import { Link } from "react-router";
+import { FiArrowRight, FiCheckCircle } from "react-icons/fi";
 import Hero from "../components/Home/Hero";
 import FeatureProduct from "../components/Home/FeatureProduct";
 import State from "../components/Home/State";
 import Work from "../components/Home/Work";
 import Categories from "../components/Categories/Categories";
+import CTA from "../components/Home/CTA";
 
 const Home = () => {
   return (
-    <div>
+    <div className="bg-white">
       {/* Hero Section */}
       <Hero />
 
@@ -21,31 +24,20 @@ const Home = () => {
       <Work />
 
       {/* Categories Section */}
-        <Categories />
-   
+      <Categories />
 
       {/* CTA Section */}
-      <div className="py-16 bg-blue-600 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4">
-            Ready to Start Your Learning Journey?
-          </h2>
-          <p className="text-xl mb-8">
-            Join thousands of students and tutors on TuitionHub today
-          </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <a
-              href="/register"
-              className="btn btn-lg bg-white text-blue-600 hover:bg-gray-100"
-            >
-              Register as Student
-            </a>
-            <a
-              href="/register"
-              className="btn btn-lg btn-outline border-white text-white hover:bg-white hover:text-blue-600"
-            >
-              Register as Tutor
-            </a>
+      <CTA />
+
+      {/* Trust Section */}
+      <div className="py-12 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-slate-600 font-semibold text-sm uppercase tracking-wide">Trusted By Leading Educational Institutions</p>
+          <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-8 items-center">
+            <div className="text-slate-400 font-semibold">Bepza High School</div>
+            <div className="text-slate-400 font-semibold">Metro University</div>
+            <div className="text-slate-400 font-semibold">City College</div>
+            <div className="text-slate-400 font-semibold">CP Academy</div>
           </div>
         </div>
       </div>
