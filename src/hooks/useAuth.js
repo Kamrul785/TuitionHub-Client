@@ -274,7 +274,6 @@ const useAuth = () => {
           headers: { Authorization: `JWT ${authTokens?.access}` },
         },
       );
-      console.log("Fetched assignments:", response.data);
       return response.data;
     } catch (error) {
       return handleApiError(
@@ -511,7 +510,7 @@ const useAuth = () => {
     const headers = { Authorization: `JWT ${authTokens?.access}` };
     try {
       await apiClient.delete(`/reviews/${reviewId}/`, { headers });
-      
+
       return { success: true };
     } catch (error) {
       return handleApiError(error, "Failed to delete review, Please Try again");

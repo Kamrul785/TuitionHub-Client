@@ -23,7 +23,7 @@ export default function Dashboard() {
   } = useAuthContext();
 
   const [stats, setStats] = useState({
-    tutionsCreated: "--",
+    tuitionsCreated: "--",
     studentsEnrolled: "--",
     assignmentsCreated: "--",
     pendingApplicants: "--",
@@ -77,7 +77,7 @@ export default function Dashboard() {
           }
 
           setStats({
-            tutionsCreated: myTuitions.length,
+            tuitionsCreated: myTuitions.length,
             studentsEnrolled: totalStudents,
             assignmentsCreated: totalAssignments,
             pendingApplicants: pendingApps.length,
@@ -114,7 +114,7 @@ export default function Dashboard() {
           ).length;
 
           setStats({
-            tutionsCreated: "--",
+            tuitionsCreated: "--",
             studentsEnrolled: "--",
             assignmentsCreated: "--",
             pendingApplicants: "--",
@@ -148,7 +148,7 @@ export default function Dashboard() {
           {
             icon: FiBookOpen,
             label: "Tuitions Created",
-            value: stats.tutionsCreated,
+            value: stats.tuitionsCreated,
             badge: "Total posted",
             badgeClass: "badge badge-outline text-xs",
           },

@@ -1,6 +1,14 @@
 import React from "react";
 import useAuthContext from "../../hooks/useAuthContext";
-import { FiBookOpen, FiMenu, FiX, FiUser, FiLogOut, FiGrid, FiHome } from "react-icons/fi";
+import {
+  FiBookOpen,
+  FiMenu,
+  FiX,
+  FiUser,
+  FiLogOut,
+  FiGrid,
+  FiHome,
+} from "react-icons/fi";
 import { Link } from "react-router";
 
 const Navbar = ({ sidebarOpen }) => {
@@ -10,28 +18,30 @@ const Navbar = ({ sidebarOpen }) => {
     <div className="navbar bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm px-4">
       {/* Mobile Sidebar Toggle */}
       <div className="flex-none lg:hidden">
-        <label htmlFor="drawer-toggle" className="btn btn-square btn-ghost hover:bg-blue-50">
+        <label
+          htmlFor="drawer-toggle"
+          className="btn btn-square btn-ghost hover:bg-blue-50"
+        >
           {sidebarOpen ? (
             <FiX className="h-5 w-5 text-slate-700" />
           ) : (
             <FiMenu className="h-5 w-5 text-slate-700" />
           )}
-        </label>    
+        </label>
       </div>
 
       {/* Dashboard Title */}
       <div className="flex-1">
         <div className="flex items-center gap-3">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+            {" "}
             <FiBookOpen className="h-5 w-5" />
           </span>
           <div>
             <p className="text-xs uppercase tracking-wide text-slate-500 font-medium">
               Overview
             </p>
-            <h2 className="text-lg font-bold text-slate-900">
-              Dashboard
-            </h2>
+            <h2 className="text-lg font-bold text-slate-900">Dashboard</h2>
           </div>
         </div>
       </div>
@@ -51,8 +61,8 @@ const Navbar = ({ sidebarOpen }) => {
 
           {/* Profile Dropdown */}
           <div className="dropdown dropdown-end ">
-            <label 
-              tabIndex={0} 
+            <label
+              tabIndex={0}
               className="btn btn-ghost btn-circle border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-all"
             >
               <FiUser className="w-5 h-5 text-slate-700" />
@@ -67,9 +77,7 @@ const Navbar = ({ sidebarOpen }) => {
                   <span className="text-sm font-semibold text-slate-800">
                     {user?.first_name || user?.email}
                   </span>
-                  <span className="text-xs text-slate-500">
-                    {user?.email}
-                  </span>
+                  <span className="text-xs text-slate-500">{user?.email}</span>
                   <span className="text-xs text-blue-600 capitalize font-medium">
                     {user?.role || "User"}
                   </span>
@@ -77,8 +85,8 @@ const Navbar = ({ sidebarOpen }) => {
               </li>
 
               <li>
-                <Link 
-                  to="/" 
+                <Link
+                  to="/"
                   className="flex items-center gap-3 hover:bg-blue-50 hover:text-blue-600 rounded-lg"
                 >
                   <FiHome className="w-4 h-4" />
@@ -87,18 +95,18 @@ const Navbar = ({ sidebarOpen }) => {
               </li>
 
               <li>
-                <Link 
-                  to="/dashboard" 
+                <Link
+                  to="/dashboard"
                   className="flex items-center gap-3 hover:bg-blue-50 hover:text-blue-600 rounded-lg"
                 >
                   <FiGrid className="w-4 h-4" />
                   <span className="font-medium">Dashboard</span>
                 </Link>
               </li>
-              
+
               <li>
-                <Link 
-                  to="/profile" 
+                <Link
+                  to="/profile"
                   className="flex items-center gap-3 hover:bg-blue-50 hover:text-blue-600 rounded-lg"
                 >
                   <FiUser className="w-4 h-4" />
@@ -106,7 +114,7 @@ const Navbar = ({ sidebarOpen }) => {
                 </Link>
               </li>
 
-              <div className="divider my-1"></div>
+              <div className="divider my-1" aria-hidden="true"></div>
 
               <li>
                 <button
