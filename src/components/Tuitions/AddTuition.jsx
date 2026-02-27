@@ -41,16 +41,15 @@ const AddTuition = () => {
       };
 
       const result = await createTuition(payload);
-      if (result.success) {
+      if (result?.success) {
         setSuccessMsg("Tuition posted successfully!");
         reset();
         setTimeout(() => {
           navigate("/dashboard/tuitions");
         }, 1500);
       } else {
-        setErrorMsg(result.message || "Failed to create tuition");
-      }
-    } catch (error) {
+        setErrorMsg(result?.message || "Failed to create tuition");
+      }    } catch (error) {
       const message =
         error.response?.data?.detail ||
         Object.values(error.response?.data || {})

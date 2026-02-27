@@ -36,7 +36,7 @@ export default function Dashboard() {
   const [applications, setApplications] = useState([]);
   const [statsLoading, setStatsLoading] = useState(true);
 
-  const role = user?.role;
+  const role = user?.role;  
 
   useEffect(() => {
     const fetchStats = async () => {
