@@ -15,7 +15,7 @@ const Navbar = ({ sidebarOpen }) => {
   const { user, logoutUser } = useAuthContext();
 
   return (
-    <div className="navbar bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm px-4">
+    <div className="navbar bg-white/95 backdrop-blur-sm border-b border-slate-200 shadow-sm px-4 sticky top-0 z-50">
       {/* Mobile Sidebar Toggle */}
       <div className="flex-none lg:hidden">
         <label
@@ -33,7 +33,7 @@ const Navbar = ({ sidebarOpen }) => {
       {/* Dashboard Title */}
       <div className="flex-1">
         <div className="flex items-center gap-3">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-blue-600 text-white">
             {" "}
             <FiBookOpen className="h-5 w-5" />
           </span>
@@ -60,7 +60,7 @@ const Navbar = ({ sidebarOpen }) => {
           </div>
 
           {/* Profile Dropdown */}
-          <div className="dropdown dropdown-end ">
+          <div className="dropdown dropdown-end z-100">
             <label
               tabIndex={0}
               className="btn btn-ghost btn-circle border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50 transition-all"
@@ -69,7 +69,7 @@ const Navbar = ({ sidebarOpen }) => {
             </label>
             <ul
               tabIndex={0}
-              className="menu dropdown-content bg-white rounded-lg shadow-lg border border-slate-200 z-50 mt-3 w-56 p-2"
+              className="menu dropdown-content bg-white rounded-lg shadow-lg border border-slate-200 z-100 mt-3 w-56 p-2"
             >
               {/* User Info in Dropdown - Mobile Only */}
               <li className="md:hidden px-4 py-2 border-b border-slate-200 mb-2">
@@ -106,7 +106,7 @@ const Navbar = ({ sidebarOpen }) => {
 
               <li>
                 <Link
-                  to="/profile"
+                  to="/dashboard/profile"
                   className="flex items-center gap-3 hover:bg-blue-50 hover:text-blue-600 rounded-lg"
                 >
                   <FiUser className="w-4 h-4" />

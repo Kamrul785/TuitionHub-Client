@@ -34,11 +34,13 @@ export default function Dashboard() {
   });
 
   const [applications, setApplications] = useState([]);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   const role = user?.role;
 
   useEffect(() => {
     const fetchStats = async () => {
+      setStatsLoading(true);
       try {
         if (role === "Tutor") {
           const tutionsData = await fetchTuitions();
@@ -126,6 +128,8 @@ export default function Dashboard() {
         }
       } catch (error) {
         console.error("Error fetching stats:", error);
+      } finally {
+        setStatsLoading(false);
       }
     };
 
@@ -205,31 +209,44 @@ export default function Dashboard() {
           },
         ];
 
-  const activityTitle = "Recent Applications";  const activityColumns =
+  const activityTitle = "Recent Applications";
+  const activityColumns =
     role === "Tutor"
       ? ["Application ID", "Student", "Tuition", "Status", "Date"]
       : ["Application ID", "Tuition", "Tutor", "Status", "Date"];
 
   return (
     <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 ">
-        {statCards.map((card, index) => (
-          <StatCard
-            key={index}
-            icon={card.icon}
-            label={card.label}
-            value={card.value}
-            badge={card.badge}
-            badgeClass={card.badgeClass}
+      {statsLoading ? (
+        // Show loading spinner while fetching data
+        <div className="flex items-center justify-center py-20">
+          <span className="loading loading-spinner loading-lg text-primary" />
+        </div>
+      ) : (
+        <>
+          {/* Stats Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            {statCards.map((card, index) => (
+              <StatCard
+                key={index}
+                icon={card.icon}
+                label={card.label}
+                value={card.value}
+                badge={card.badge}
+                badgeClass={card.badgeClass}
+              />
+            ))}
+          </div>
+
+          {/* Applications Panel */}
+          <ApplicationsPanel
+            role={role}
+            activityTitle={activityTitle}
+            activityColumns={activityColumns}
+            applications={applications}
           />
-        ))}
-      </div>
-      <ApplicationsPanel
-        role={role}
-        activityTitle={activityTitle}
-        activityColumns={activityColumns}
-        applications={applications}
-      />
+        </>
+      )}
     </div>
   );
 }

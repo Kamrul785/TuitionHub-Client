@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import apiClient from "../../services/api-client";
+import useAuthContext from "../../hooks/useAuthContext";
 import { FiBookOpen, FiArrowLeft, FiCheckCircle, FiAlertCircle, FiInfo } from "react-icons/fi";
 
 const AddTuition = () => {
@@ -9,6 +9,7 @@ const AddTuition = () => {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
+  const { createTuition } = useAuthContext();
 
   const {
     register,
@@ -39,12 +40,16 @@ const AddTuition = () => {
           data.availability === "true" || data.availability === true,
       };
 
-      await apiClient.post("/tuitions/", payload);
-      setSuccessMsg("Tuition posted successfully!");
-      reset();
-      setTimeout(() => {
-        navigate("/dashboard/tuitions");
-      }, 1500);
+      const result = await createTuition(payload);
+      if (result.success) {
+        setSuccessMsg("Tuition posted successfully!");
+        reset();
+        setTimeout(() => {
+          navigate("/dashboard/tuitions");
+        }, 1500);
+      } else {
+        setErrorMsg(result.message || "Failed to create tuition");
+      }
     } catch (error) {
       const message =
         error.response?.data?.detail ||
@@ -81,13 +86,13 @@ const AddTuition = () => {
         {/* Messages */}
         {successMsg && (
           <div className="mb-6 p-4 rounded-lg bg-green-50 border border-green-200 flex items-start gap-3">
-            <FiCheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+            <FiCheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
             <p className="text-sm text-green-800">{successMsg}</p>
           </div>
         )}
         {errorMsg && (
           <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
-            <FiAlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <FiAlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
             <p className="text-sm text-red-800">{errorMsg}</p>
           </div>
         )}

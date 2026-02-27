@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 import apiClient from "../../services/api-client";
@@ -7,12 +7,11 @@ import { FiBookOpen, FiArrowLeft } from "react-icons/fi";
 
 const EditTuition = () => {
   const { id } = useParams();
-  const { user } = useAuthContext();
+  const { user, updateTuition } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [tuitionData, setTuitionData] = useState(null);
   const navigate = useNavigate();
 
   const {
@@ -22,13 +21,11 @@ const EditTuition = () => {
     reset,
   } = useForm();
 
-  useEffect(() => {
-    fetchTuition();
-  }, [id]);
-
-  const fetchTuition = async () => {
+  const fetchTuition = useCallback(async () => {
     try {
-      const response = await apiClient.get(`/tuitions/${id}/`);
+      const response = await apiClient.get(`/tuitions/${id}/`, {
+        headers: { Authorization: `JWT ${localStorage.getItem("authTokens") ? JSON.parse(localStorage.getItem("authTokens")).access : "" }` },
+      });
       // Check if current user is the tutor who created this tuition
       if (response.data.tutor_email !== user?.email) {
         setErrorMsg("You can only edit your own tuitions");
@@ -37,7 +34,6 @@ const EditTuition = () => {
         }, 2000);
         return;
       }
-      setTuitionData(response.data);
       reset({
         title: response.data.title,
         description: response.data.description,
@@ -46,12 +42,15 @@ const EditTuition = () => {
         availability: response.data.availability,
       });
     } catch (error) {
-        
-      setErrorMsg(error, "Failed to fetch tuition details");
+      setErrorMsg(error.response?.data?.detail || "Failed to fetch tuition details");
     } finally {
       setFetching(false);
     }
-  };
+  }, [id, user?.email, navigate, reset]);
+
+  useEffect(() => {
+    fetchTuition();
+  }, [fetchTuition]);
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -66,11 +65,15 @@ const EditTuition = () => {
         availability: data.availability === "true" || data.availability === true,
       };
 
-      await apiClient.put(`/tuitions/${id}/`, payload);
-      setSuccessMsg("Tuition updated successfully!");
-      setTimeout(() => {
-        navigate("/dashboard/tuitions");
-      }, 1500);
+      const result = await updateTuition(id, payload);
+      if (result.success) {
+        setSuccessMsg("Tuition updated successfully!");
+        setTimeout(() => {
+          navigate("/dashboard/tuitions");
+        }, 1500);
+      } else {
+        setErrorMsg(result.message || "Failed to update tuition");
+      }
     } catch (error) {
       const message =
         error.response?.data?.detail ||

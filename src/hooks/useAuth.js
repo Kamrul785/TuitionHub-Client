@@ -201,6 +201,60 @@ const useAuth = () => {
     }
   };
 
+  // Create Tuition
+  const createTuition = async (payload) => {
+    setErrorMsg("");
+    setSuccessMsg("");
+    try {
+      const response = await apiClient.post("/tuitions/", payload, {
+        headers: { Authorization: `JWT ${authTokens?.access}` },
+      });
+      setSuccessMsg("Tuition created successfully!");
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to create tuition, Please try again",
+      );
+    }
+  };
+
+  // Update Tuition
+  const updateTuition = async (tuitionId, payload) => {
+    setErrorMsg("");
+    setSuccessMsg("");
+    try {
+      const response = await apiClient.put(`/tuitions/${tuitionId}/`, payload, {
+        headers: { Authorization: `JWT ${authTokens?.access}` },
+      });
+      setSuccessMsg("Tuition updated successfully!");
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to update tuition, Please try again",
+      );
+    }
+  };
+
+  // Delete Tuition
+  const deleteTuition = async (tuitionId) => {
+    setErrorMsg("");
+    setSuccessMsg("");
+    try {
+      await apiClient.delete(`/tuitions/${tuitionId}/`, {
+        headers: { Authorization: `JWT ${authTokens?.access}` },
+      });
+      setSuccessMsg("Tuition deleted successfully!");
+      return { success: true };
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to delete tuition, Please try again",
+      );
+    }
+  };
+
   //Fetch Applications
   const fetchApplications = async () => {
     try {
@@ -546,6 +600,9 @@ const useAuth = () => {
     resetPasswordRequest,
     resetPasswordConfirm,
     fetchTuitions,
+    createTuition,
+    updateTuition,
+    deleteTuition,
     fetchApplications,
     applyForTuition,
     fetchEnrollments,

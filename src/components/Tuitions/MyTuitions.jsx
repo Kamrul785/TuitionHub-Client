@@ -1,27 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router";
 import { FiEdit2, FiTrash2, FiPlus, FiBookOpen } from "react-icons/fi";
-import apiClient from "../../services/api-client";
 import useAuthContext from "../../hooks/useAuthContext";
 
 const MyTuitions = () => {
-  const { user } = useAuthContext();
+  const { user, fetchTuitions, deleteTuition } = useAuthContext();
   const [tuitions, setTuitions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  useEffect(() => {
-    if (!user?.email) return;
-    fetchTuitions();
-  }, [user]);
-  const fetchTuitions = async () => {
+  // Define fetchTuitionsData BEFORE useEffect
+  const fetchTuitionsData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get("/tuitions/");
+      const response = await fetchTuitions();
       // Filter only current tutor's tuitions by comparing tutor_email
-      const allTuitions = response.data.results || response.data || [];
+      const allTuitions = response.results || response || [];
       const myTuitions = allTuitions.filter(
         (tuition) => tuition.tutor_email === user?.email,
       );
@@ -31,7 +27,12 @@ const MyTuitions = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchTuitions, user?.email]);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    fetchTuitionsData();
+  }, [fetchTuitionsData, user?.email]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this tuition?")) {
@@ -40,10 +41,15 @@ const MyTuitions = () => {
 
     setDeleting(id);
     try {
-      await apiClient.delete(`/tuitions/${id}/`);
-      setSuccessMsg("Tuition deleted successfully!");
-      setTuitions(tuitions.filter((t) => t.id !== id));
-      setTimeout(() => setSuccessMsg(""), 3000);
+      const result = await deleteTuition(id);
+      if (result.success) {
+        setTuitions(tuitions.filter((t) => t.id !== id));
+        setSuccessMsg("Tuition deleted successfully!");
+        setTimeout(() => setSuccessMsg(""), 3000);
+      } else {
+        setErrorMsg(result.message || "Failed to delete tuition");
+        setTimeout(() => setErrorMsg(""), 3000);
+      }
     } catch (error) {
       setErrorMsg(error?.response?.data?.message || "Failed to delete tuition");
       setTimeout(() => setErrorMsg(""), 3000);
@@ -53,7 +59,7 @@ const MyTuitions = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 p-6">
+    <div className="min-h-screen bg-linear-to-b from-slate-50 via-white to-slate-50 p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
