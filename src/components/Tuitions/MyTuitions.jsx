@@ -128,6 +128,13 @@ const MyTuitions = () => {
                     <span className="badge badge-outline text-xs">
                       {tuition.class_level}
                     </span>
+                    {tuition.is_paid ? (
+                      <span className="badge badge-info text-xs">
+                        Paid: {tuition.price} BDT
+                      </span>
+                    ) : (
+                      <span className="badge badge-success text-xs">Free</span>
+                    )}
                   </div>
 
                   <div className="flex items-center justify-between">

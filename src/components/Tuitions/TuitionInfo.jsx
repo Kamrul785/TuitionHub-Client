@@ -48,6 +48,17 @@ const TuitionInfo = ({ tuition, onApply, applying, canApply, checkApply, applica
         </div>
       </div>
 
+      <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="space-y-2">
+          <p className="text-sm text-slate-500">Price</p>
+          {tuition.is_paid ? (
+            <p className="font-semibold text-slate-800">{tuition.price} BDT</p>
+          ) : (
+            <span className="badge badge-success">Free</span>
+          )}
+        </div>
+      </div>
+
       <div className="space-y-3">
         <h2 className="text-xl font-semibold text-slate-900">Description</h2>
         <p className="text-slate-700 leading-relaxed whitespace-pre-line">

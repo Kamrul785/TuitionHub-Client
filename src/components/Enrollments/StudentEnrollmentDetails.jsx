@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
+import authApiClient from "../../services/auth-api-client";
 import useAuthContext from "../../hooks/useAuthContext";
-
 const StudentEnrollmentDetails = () => {
   const { id } = useParams();
   const { fetchEnrollmentById } = useAuthContext();
   const [enrollment, setEnrollment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   useEffect(() => {
     const loadEnrollment = async () => {
@@ -36,8 +37,39 @@ const StudentEnrollmentDetails = () => {
     return date.toLocaleString();
   };
 
+  // Payment logic
+  const needsPayment = enrollment?.is_paid === true && enrollment?.payment_verified === false;
+  const paymentVerified = enrollment?.payment_verified === true;
+
+  const handlePayNow = async () => {
+    setPaymentLoading(true);
+    try {
+      const response = await authApiClient.post(
+        "/payment/initiate/",
+        {
+          amount: enrollment.price,
+          enrollment_id: enrollment.id,
+        }
+      );
+      // Backend will return payment_url, you can redirect here
+      if (response.data?.payment_url) {
+        window.location.href = response.data.payment_url;
+      } else {
+        alert("Failed to initiate payment. Please try again.");
+      }
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.error ||
+        err.response?.data?.detail ||
+        "Payment initiation failed. Please try again.";
+      alert(errorMessage);
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 p-6">
+    <div className="min-h-screen bg-linear-to-b from-slate-50 via-white to-slate-50 p-6">
       <div className="max-w-5xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-slate-800">
@@ -86,19 +118,68 @@ const StudentEnrollmentDetails = () => {
                   </div>
                 </div>
 
+                {needsPayment && (
+                  <div className="alert alert-warning">
+                    <span>
+                      Payment required: {enrollment.price} BDT. Click "Pay Now" to complete payment.
+                    </span>
+                  </div>
+                )}
+
+                {paymentVerified && (
+                  <div className="alert alert-success">
+                    <span>✓ Payment verified. You have full access to this tuition.</span>
+                  </div>
+                )}
+
                 <div className="flex flex-col md:flex-row gap-3">
-                  <Link
-                    to={`/dashboard/my-enrollments/${id}/assignments`}
-                    className="btn btn-primary"
-                  >
-                    View Assignments
-                  </Link>
-                  <Link
-                    to={`/dashboard/my-enrollments/${id}/topics`}
-                    className="btn btn-outline"
-                  >
-                    View Topics
-                  </Link>
+                  {needsPayment ? (
+                    <>
+                      <button
+                        onClick={handlePayNow}
+                        disabled={paymentLoading}
+                        className="btn btn-primary"
+                      >
+                        {paymentLoading ? (
+                          <>
+                            <span className="loading loading-spinner loading-sm"></span>
+                            Processing...
+                          </>
+                        ) : (
+                          "Pay Now"
+                        )}
+                      </button>
+                      <button
+                        disabled
+                        className="btn btn-primary opacity-50 cursor-not-allowed"
+                        title="Complete payment to unlock"
+                      >
+                        View Assignments
+                      </button>
+                      <button
+                        disabled
+                        className="btn btn-outline opacity-50 cursor-not-allowed"
+                        title="Complete payment to unlock"
+                      >
+                        View Topics
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to={`/dashboard/my-enrollments/${id}/assignments`}
+                        className="btn btn-primary"
+                      >
+                        View Assignments
+                      </Link>
+                      <Link
+                        to={`/dashboard/my-enrollments/${id}/topics`}
+                        className="btn btn-outline"
+                      >
+                        View Topics
+                      </Link>
+                    </>
+                  )}
                   <Link
                     to="/dashboard/my-enrollments"
                     className="btn btn-ghost"

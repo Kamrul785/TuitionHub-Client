@@ -16,6 +16,7 @@ const AddTuition = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm({
     defaultValues: {
       title: "",
@@ -23,8 +24,12 @@ const AddTuition = () => {
       class_level: "",
       subject: "",
       availability: true,
+      is_paid: false,
+      price: "",
     },
   });
+
+  const isPaid = watch("is_paid");
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -38,7 +43,13 @@ const AddTuition = () => {
         subject: data.subject,
         availability:
           data.availability === "true" || data.availability === true,
+        is_paid: data.is_paid === "true" || data.is_paid === true,
       };
+
+      // Add price only if it's a paid tuition
+      if (payload.is_paid && data.price) {
+        payload.price = parseFloat(data.price);
+      }
 
       const result = await createTuition(payload);
       if (result?.success) {
@@ -216,6 +227,47 @@ const AddTuition = () => {
                   />
                 </label>
               </div>
+
+              {/* Is Paid */}
+              <div className="form-control w-full">
+                <label className="label cursor-pointer">
+                  <span className="label-text font-semibold text-slate-900">This is a Paid Tuition</span>
+                  <input
+                    type="checkbox"
+                    className="toggle toggle-primary"
+                    {...register("is_paid")}
+                  />
+                </label>
+              </div>
+
+              {/* Price - Only show if is_paid is true */}
+              {isPaid && (
+                <div className="form-control w-full">
+                  <label className="label pb-2">
+                    <span className="label-text font-semibold text-slate-900">Price (BDT)</span>
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="e.g., 5000"
+                    className="input input-bordered w-full"
+                    step="0.01"
+                    {...register("price", {
+                      required: isPaid ? "Price is required for paid tuitions" : false,
+                      min: {
+                        value: 0,
+                        message: "Price must be 0 or greater",
+                      },
+                    })}
+                  />
+                  {errors.price && (
+                    <label className="label pt-2">
+                      <span className="label-text-alt text-error text-xs">
+                        {errors.price.message}
+                      </span>
+                    </label>
+                  )}
+                </div>
+              )}
 
               {/* Buttons */}
               <div className="flex gap-3 pt-4">
