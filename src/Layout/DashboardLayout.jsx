@@ -2,14 +2,6 @@ import { useState } from "react";
 import useAuthContext from "../hooks/useAuthContext";
 import Navbar from "../components/Dashboard/Navbar";
 import Sidebar from "../components/Dashboard/Sidebar";
-import ApplicationsPanel from "../components/Dashboard/ApplicationsPanel";
-import {
-  FiBookOpen,
-  FiPlusCircle,
-  FiShoppingCart,
-  FiStar,
-  FiUsers,
-} from "react-icons/fi";
 import { Outlet } from "react-router";
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

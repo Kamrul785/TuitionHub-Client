@@ -32,6 +32,8 @@ import HowItWorks from "../pages/HowItWorks";
 import FAQ from "../pages/FAQ";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import PaymentFail from "../pages/PaymentFail";
+import Transactions from "../pages/Transactions";
+import Invoice from "../pages/Invoice";
 
 const AppRoutes = () => {
   return (
@@ -77,9 +79,10 @@ const AppRoutes = () => {
         <Route path="my-enrollments/:id/topics" element={<StudentEnrollmentTopics />}  />
         <Route path="progress" element={<StudentProgress />} />
         <Route path="reviews" element={<Reviews />} />
+        <Route path="transactions" element={<Transactions />} />
+        <Route path="transactions/:id/invoice" element={<Invoice />} />
         <Route path="payment/success/" element={<PaymentSuccess />} />
         <Route path="payment/fail/" element={<PaymentFail />} />
-       
       </Route>
     </Routes>
   );

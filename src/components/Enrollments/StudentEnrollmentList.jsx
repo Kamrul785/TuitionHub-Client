@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {  useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import useAuthContext from "../../hooks/useAuthContext";
 
@@ -45,8 +45,20 @@ const StudentEnrollmentList = () => {
     return date.toLocaleString();
   };
 
+  const getPaymentStatus = (item) => {
+    if (item?.is_paid === false) {
+      return { label: "Free", className: "badge badge-success" };
+    }
+
+    if (item?.is_paid === true && item?.payment_verified === true) {
+      return { label: "Paid", className: "badge badge-primary" };
+    }
+
+    return { label: "Not Paid", className: "badge badge-warning" };
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 p-6">
+    <div className="min-h-screen bg-linear-to-b from-slate-50 via-white to-slate-50 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-slate-800">My Enrollments</h1>
@@ -86,28 +98,38 @@ const StudentEnrollmentList = () => {
                     <tr>
                       <th>Tuition</th>
                       <th>Enrolled On</th>
+                      <th>Payment Status</th>
                       <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredEnrollments.map((item) => (    
-                      <tr key={item.id} className="hover:bg-slate-50">
-                        <td className="font-medium text-slate-800">
-                          {item.tuition_title}
-                        </td>
-                        <td className="text-slate-500 text-sm">
-                          {formatDate(item.enrolled_at)}
-                        </td>
-                        <td>
-                          <Link
-                            to={`/dashboard/my-enrollments/${item.id}`}
-                            className="btn btn-primary btn-xs"
-                          >
-                            View Details
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
+                    {filteredEnrollments.map((item) => {
+                      const paymentStatus = getPaymentStatus(item);
+
+                      return (
+                        <tr key={item.id} className="hover:bg-slate-50">
+                          <td className="font-medium text-slate-800">
+                            {item.tuition_title}
+                          </td>
+                          <td className="text-slate-500 text-sm">
+                            {formatDate(item.enrolled_at)}
+                          </td>
+                          <td className="text-slate-500 text-sm">
+                            <span className={paymentStatus.className}>
+                              {paymentStatus.label}
+                            </span>
+                          </td>
+                          <td>
+                            <Link
+                              to={`/dashboard/my-enrollments/${item.id}`}
+                              className="btn btn-primary btn-xs"
+                            >
+                              View Details
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
 

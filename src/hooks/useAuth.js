@@ -571,6 +571,35 @@ const useAuth = () => {
     }
   };
 
+  // Payments
+  const fetchMyPayments = async (queryParams = "") => {
+    try {
+      const response = await apiClient.get(`/payments/my_payments/${queryParams}`, {
+        headers: { Authorization: `JWT ${authTokens?.access}` },
+      });
+      return response.data;
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to fetch payment history, Please Try again",
+      );
+    }
+  };
+
+  const fetchPaymentById = async (paymentId) => {
+    try {
+      const response = await apiClient.get(`/payments/${paymentId}/`, {
+        headers: { Authorization: `JWT ${authTokens?.access}` },
+      });
+      return response.data;
+    } catch (error) {
+      return handleApiError(
+        error,
+        "Failed to fetch payment details, Please Try again",
+      );
+    }
+  };
+
   // Select Application
   const selectApplication = async (id, tuition) => {
     try {
@@ -621,6 +650,8 @@ const useAuth = () => {
     fetchTutorReviews,
     updateTuitionReview,
     deleteTuitionReview,
+    fetchMyPayments,
+    fetchPaymentById,
     selectApplication,
   };
 };

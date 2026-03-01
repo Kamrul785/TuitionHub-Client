@@ -4,8 +4,9 @@ import authApiClient from "../../services/auth-api-client";
 import useAuthContext from "../../hooks/useAuthContext";
 const StudentEnrollmentDetails = () => {
   const { id } = useParams();
-  const { fetchEnrollmentById } = useAuthContext();
+  const { fetchEnrollmentById, fetchTuitions } = useAuthContext();
   const [enrollment, setEnrollment] = useState(null);
+  const [tuitionTutorEmail, setTuitionTutorEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [paymentLoading, setPaymentLoading] = useState(false);
@@ -19,8 +20,26 @@ const StudentEnrollmentDetails = () => {
       if (data?.success === false) {
         setError(data.message || "Failed to load enrollment details.");
         setEnrollment(null);
+        setTuitionTutorEmail("");
       } else {
         setEnrollment(data);
+
+        if (data?.tutor_email) {
+          setTuitionTutorEmail(data.tutor_email);
+        } else if (data?.tuition) {
+          const tuitionData = await fetchTuitions();
+          if (tuitionData?.success === false) {
+            setTuitionTutorEmail("");
+          } else {
+            const tuitionList = tuitionData?.results || [];
+            const matchedTuition = tuitionList.find(
+              (tuition) => tuition.id === data.tuition,
+            );
+            setTuitionTutorEmail(matchedTuition?.tutor_email || "");
+          }
+        } else {
+          setTuitionTutorEmail("");
+        }
       }
 
       setLoading(false);
@@ -29,7 +48,7 @@ const StudentEnrollmentDetails = () => {
     if (id) {
       loadEnrollment();
     }
-  }, [fetchEnrollmentById, id]);
+  }, [fetchEnrollmentById, fetchTuitions, id]);
 
   const formatDate = (isoString) => {
     if (!isoString) return "-";
@@ -101,7 +120,7 @@ const StudentEnrollmentDetails = () => {
                   <div className="rounded-lg border border-slate-200 p-4">
                     <p className="text-sm text-slate-500">Tutor Email</p>
                     <p className="text-lg font-semibold text-slate-800">
-                      {enrollment.tutor_email || "-"}
+                      {enrollment.tutor_email || tuitionTutorEmail || "-"}
                     </p>
                   </div>
                   <div className="rounded-lg border border-slate-200 p-4">

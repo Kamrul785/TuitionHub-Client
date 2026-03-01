@@ -1,6 +1,7 @@
 import {
   FiBarChart2,
   FiBookOpen,
+  FiCreditCard,
   FiPlusCircle,
   FiShoppingCart,
   FiStar,
@@ -64,6 +65,12 @@ const Sidebar = ({ role }) => {
       label: "Reviews",
       path: "/dashboard/reviews",
       icon: FiStar,
+      roles: ["Tutor", "User"],
+    },
+    {
+      label: "Transactions",
+      path: "/dashboard/transactions",
+      icon: FiCreditCard,
       roles: ["Tutor", "User"],
     },
     {
