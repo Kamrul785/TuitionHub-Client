@@ -47,7 +47,7 @@ const TuitionDetails = () => {
         setTuition(response.data);
       } catch (err) {
         setError(
-          err.response?.data?.detail || "Unable to load tuition details.",
+           "Unable to load tuition details.",
         );
       } finally {
         setLoading(false);
@@ -72,7 +72,7 @@ const TuitionDetails = () => {
         setApplicationStatus(existingApp || null);
       } catch (err) {
         setError(
-          err.response?.data?.detail || "Failed to check application status.",
+           "Failed to check application status.",
         );
       } finally {
         setCheckApply(false);
@@ -95,7 +95,7 @@ const TuitionDetails = () => {
       const data = await fetchTuitionReviews(id);
 
       if (data?.success === false) {
-        setReviewsError(data.message || "Failed to fetch reviews.");
+        setReviewsError("Login to view reviews.");
         setReviews([]);
       } else {
         setReviews(normalizeList(data));
@@ -190,7 +190,7 @@ const TuitionDetails = () => {
     // console.log("Review result:", result);
 
     if (result?.success === false) {
-      setReviewsError(result.message || "Failed to submit review.");
+      setReviewsError("Failed to submit review.");
       // console.error("Review submission failed:", result.message);
     } else if (result?.success === true && result?.data) {
       setReviews((prev) => [result.data, ...prev]);
