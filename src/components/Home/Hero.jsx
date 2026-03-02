@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { FiArrowRight } from "react-icons/fi";
 import heroImage from "../../assets/hero_img.png";
 import BlurText from "../Animations/BlurText";
+import ShinyText from "../Animations/ShinyText";
 
 const Hero = () => {
   return (
@@ -18,7 +19,13 @@ const Hero = () => {
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-6">
               Find Your Perfect{" "}
-              <span className="text-indigo-600">Tutor</span>
+              <ShinyText
+                text="Tutor"
+                color="#4f46e5"
+                shineColor="#a5b4fc"
+                speed={2}
+                className="text-indigo-600"
+              />
             </h1>
 
             <div className="mb-8">

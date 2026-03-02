@@ -1,5 +1,6 @@
 ﻿import { FiArrowRight, FiCheckCircle, FiBook, FiAward } from "react-icons/fi";
 import { Link } from "react-router";
+import ShinyText from "../Animations/ShinyText";
 
 const CTA = () => {
   return (
@@ -12,7 +13,14 @@ const CTA = () => {
             </div>
 
             <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
-              Ready to Transform Your Learning Journey?
+              Ready to Transform Your{" "}
+              <ShinyText
+                text="Learning Journey?"
+                color="#c7d2fe"
+                shineColor="#ffffff"
+                speed={3}
+                className="text-indigo-200"
+              />
             </h2>
 
             <p className="text-slate-400 leading-relaxed">

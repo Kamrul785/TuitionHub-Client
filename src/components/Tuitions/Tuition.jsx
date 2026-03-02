@@ -4,6 +4,7 @@ import useFetchTuitions from "../../hooks/FetchTuition";
 import { TuitionCardSkeleton } from "../ui/Skeleton";
 import EmptyState from "../ui/EmptyState";
 import SectionHeader from "../ui/SectionHeader";
+import ShinyText from "../Animations/ShinyText";
 import {
   FiSearch,
   FiX,
@@ -43,7 +44,7 @@ const Tuition = () => {
       <section className="bg-white border-b border-slate-200">
         <div className="section-container py-8">
           <SectionHeader
-            title="Browse Tuitions"
+            title={<>Browse <ShinyText text="Tuitions" color="#4f46e5" shineColor="#a5b4fc" speed={3} className="text-indigo-600" /></>}
             description="Quickly scan open tuitions and dive into details when you find a fit."
           />
         </div>
