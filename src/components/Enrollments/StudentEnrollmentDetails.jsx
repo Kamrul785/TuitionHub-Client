@@ -1,13 +1,14 @@
 ﻿import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import authApiClient from "../../services/auth-api-client";
+import apiClient from "../../services/api-client";
 import useAuthContext from "../../hooks/useAuthContext";
 import { useToast } from "../ui/Toast";
 import { FiArrowLeft, FiClipboard, FiBookOpen, FiCreditCard } from "react-icons/fi";
 
 const StudentEnrollmentDetails = () => {
   const { id } = useParams();
-  const { fetchEnrollmentById, fetchTuitions } = useAuthContext();
+  const { fetchEnrollmentById } = useAuthContext();
   const toast = useToast();
   const [enrollment, setEnrollment] = useState(null);
   const [tuitionTutorEmail, setTuitionTutorEmail] = useState("");
@@ -27,18 +28,18 @@ const StudentEnrollmentDetails = () => {
         setEnrollment(data);
         if (data?.tutor_email) { setTuitionTutorEmail(data.tutor_email); }
         else if (data?.tuition) {
-          const tuitionData = await fetchTuitions();
-          if (tuitionData?.success !== false) {
-            const list = tuitionData?.results || [];
-            const match = list.find((t) => t.id === data.tuition);
-            setTuitionTutorEmail(match?.tutor_email || "");
+          try {
+            const res = await apiClient.get(`/tuitions/${data.tuition}/`);
+            setTuitionTutorEmail(res.data?.tutor_email || "");
+          } catch {
+            setTuitionTutorEmail("");
           }
         }
       }
       setLoading(false);
     };
     if (id) load();
-  }, [fetchEnrollmentById, fetchTuitions, id]);
+  }, [fetchEnrollmentById, id]);
 
   const formatDate = (s) => s ? new Date(s).toLocaleString() : "-";
   const needsPayment = enrollment?.is_paid === true && enrollment?.payment_verified === false;
