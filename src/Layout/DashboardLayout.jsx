@@ -3,6 +3,8 @@ import useAuthContext from "../hooks/useAuthContext";
 import Navbar from "../components/Dashboard/Navbar";
 import Sidebar from "../components/Dashboard/Sidebar";
 import { Outlet } from "react-router";
+import PageTransition from "../components/ui/PageTransition";
+
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, loadingUser } = useAuthContext();
@@ -14,15 +16,17 @@ const DashboardLayout = () => {
 
   if (loadingUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <span className="loading loading-spinner loading-lg" />
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-3">
+          <span className="loading loading-spinner loading-lg text-indigo-600" />
+          <p className="text-sm text-slate-400">Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="drawer lg:drawer-open bg-linear-to-b from-slate-50 via-white to-slate-50 min-h-screen">
-      {/* Mobile drawer checkbox */}
+    <div className="drawer lg:drawer-open bg-slate-50 min-h-screen">
       <input
         id="drawer-toggle"
         type="checkbox"
@@ -32,13 +36,12 @@ const DashboardLayout = () => {
       />
 
       {/* Page content */}
-      <div className="drawer-content flex flex-col">
-        {/* Navbar */}
+      <div className="drawer-content flex flex-col min-h-screen">
         <Navbar sidebarOpen={sidebarOpen} />
-
-        {/* Main content */}
-        <main className="p-6">
-          <Outlet />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
         </main>
       </div>
 

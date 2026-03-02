@@ -3,16 +3,19 @@ import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router";
 import apiClient from "../../services/api-client";
 import useAuthContext from "../../hooks/useAuthContext";
+import { useToast } from "../ui/Toast";
 import { FiBookOpen, FiArrowLeft } from "react-icons/fi";
+
+const FieldError = ({ error }) =>
+  error ? <p className="text-red-500 text-xs mt-1.5">{error.message}</p> : null;
 
 const EditTuition = () => {
   const { id } = useParams();
   const { user, updateTuition } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
-  const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
+  const toast = useToast();
 
   const {
     register,
@@ -26,12 +29,9 @@ const EditTuition = () => {
       const response = await apiClient.get(`/tuitions/${id}/`, {
         headers: { Authorization: `JWT ${localStorage.getItem("authTokens") ? JSON.parse(localStorage.getItem("authTokens")).access : "" }` },
       });
-      // Check if current user is the tutor who created this tuition
       if (response.data.tutor_email !== user?.email) {
-        setErrorMsg("You can only edit your own tuitions");
-        setTimeout(() => {
-          navigate("/dashboard/tuitions");
-        }, 2000);
+        toast.error("You can only edit your own tuitions");
+        setTimeout(() => navigate("/dashboard/tuitions"), 2000);
         return;
       }
       reset({
@@ -42,11 +42,11 @@ const EditTuition = () => {
         availability: response.data.availability,
       });
     } catch (error) {
-      setErrorMsg(error.response?.data?.detail || "Failed to fetch tuition details");
+      toast.error(error.response?.data?.detail || "Failed to fetch tuition details");
     } finally {
       setFetching(false);
     }
-  }, [id, user?.email, navigate, reset]);
+  }, [id, user?.email, navigate, reset, toast]);
 
   useEffect(() => {
     fetchTuition();
@@ -54,8 +54,6 @@ const EditTuition = () => {
 
   const onSubmit = async (data) => {
     setLoading(true);
-    setErrorMsg("");
-    setSuccessMsg("");
     try {
       const payload = {
         title: data.title,
@@ -67,12 +65,10 @@ const EditTuition = () => {
 
       const result = await updateTuition(id, payload);
       if (result.success) {
-        setSuccessMsg("Tuition updated successfully!");
-        setTimeout(() => {
-          navigate("/dashboard/tuitions");
-        }, 1500);
+        toast.success("Tuition updated successfully!");
+        setTimeout(() => navigate("/dashboard/tuitions"), 1500);
       } else {
-        setErrorMsg(result.message || "Failed to update tuition");
+        toast.error(result.message || "Failed to update tuition");
       }
     } catch (error) {
       const message =
@@ -81,7 +77,7 @@ const EditTuition = () => {
           .flat()
           .join(", ") ||
         "Failed to update tuition. Please try again.";
-      setErrorMsg(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -89,187 +85,131 @@ const EditTuition = () => {
 
   if (fetching) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <span className="loading loading-spinner loading-lg text-blue-600" />
+      <div className="section-container">
+        <div className="max-w-2xl mx-auto">
+          <div className="card-modern p-8 space-y-4">
+            <div className="skeleton-pulse h-6 w-40 rounded" />
+            <div className="skeleton-pulse h-10 w-full rounded" />
+            <div className="skeleton-pulse h-24 w-full rounded" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="skeleton-pulse h-10 rounded" />
+              <div className="skeleton-pulse h-10 rounded" />
+            </div>
+            <div className="skeleton-pulse h-10 w-32 rounded" />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-slate-50 via-white to-slate-50 p-6">
+    <div className="section-container">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-6 flex items-center gap-2">
+        <div className="mb-6">
           <button
             onClick={() => navigate("/dashboard/tuitions")}
-            className="btn btn-ghost btn-sm gap-2"
+            className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-600 transition-colors"
           >
             <FiArrowLeft className="h-4 w-4" />
-            Back
+            Back to Tuitions
           </button>
         </div>
 
-        {/* Card */}
-        <div className="card bg-white shadow-sm border border-slate-200">
-          <div className="card-body">
-            <h1 className="card-title text-2xl flex items-center gap-2 mb-6">
-              <FiBookOpen className="text-primary" />
-              Edit Tuition
-            </h1>
+        <div className="card-modern p-6 sm:p-8">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+              <FiBookOpen className="h-5 w-5 text-indigo-600" />
+            </div>
+            <h1 className="text-xl font-semibold text-slate-900">Edit Tuition</h1>
+          </div>
 
-            {/* Messages */}
-            {successMsg && (
-              <div className="alert alert-success mb-4">
-                <span>{successMsg}</span>
-              </div>
-            )}
-            {errorMsg && (
-              <div className="alert alert-error mb-4">
-                <span>{errorMsg}</span>
-              </div>
-            )}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Title</label>
+              <input
+                type="text"
+                className="input input-bordered w-full"
+                {...register("title", {
+                  required: "Title is required",
+                  minLength: { value: 5, message: "Title must be at least 5 characters" },
+                })}
+              />
+              <FieldError error={errors.title} />
+            </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {/* Title */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-medium">Title *</span>
-                </label>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
+              <textarea
+                className="textarea textarea-bordered w-full"
+                rows="4"
+                {...register("description", {
+                  required: "Description is required",
+                  minLength: { value: 20, message: "Description must be at least 20 characters" },
+                })}
+              />
+              <FieldError error={errors.description} />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Class</label>
                 <input
                   type="text"
-                  className="input input-bordered"
-                  {...register("title", {
-                    required: "Title is required",
-                    minLength: {
-                      value: 5,
-                      message: "Title must be at least 5 characters",
-                    },
+                  placeholder="e.g., Class 10"
+                  className="input input-bordered w-full"
+                  {...register("class_level", {
+                    required: "Class is required",
+                    minLength: { value: 2, message: "Class must be at least 2 characters" },
                   })}
                 />
-                {errors.title && (
-                  <label className="label">
-                    <span className="label-text-alt text-error">
-                      {errors.title.message}
-                    </span>
-                  </label>
-                )}
+                <FieldError error={errors.class_level} />
               </div>
 
-              {/* Description */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-medium">Description *</span>
-                </label>
-                <textarea
-                  className="textarea textarea-bordered"
-                  rows="4"
-                  {...register("description", {
-                    required: "Description is required",
-                    minLength: {
-                      value: 20,
-                      message: "Description must be at least 20 characters",
-                    },
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Subject</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Mathematics"
+                  className="input input-bordered w-full"
+                  {...register("subject", {
+                    required: "Subject is required",
+                    minLength: { value: 2, message: "Subject must be at least 2 characters" },
                   })}
                 />
-                {errors.description && (
-                  <label className="label">
-                    <span className="label-text-alt text-error">
-                      {errors.description.message}
-                    </span>
-                  </label>
-                )}
+                <FieldError error={errors.subject} />
               </div>
+            </div>
 
-              {/* Class & Subject Row */}
-              <div className="grid gap-4 md:grid-cols-2">
-                {/* Class Level */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-medium">Class *</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Class 10, Class 12, Grade 8"
-                    className="input input-bordered"
-                    {...register("class_level", {
-                      required: "Class is required",
-                      minLength: {
-                        value: 2,
-                        message: "Class must be at least 2 characters",
-                      },
-                    })}
-                  />
-                  {errors.class_level && (
-                    <label className="label">
-                      <span className="label-text-alt text-error">
-                        {errors.class_level.message}
-                      </span>
-                    </label>
-                  )}
-                </div>
-
-                {/* Subject */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-medium">Subject *</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Mathematics, Physics, English"
-                    className="input input-bordered"
-                    {...register("subject", {
-                      required: "Subject is required",
-                      minLength: {
-                        value: 2,
-                        message: "Subject must be at least 2 characters",
-                      },
-                    })}
-                  />
-                  {errors.subject && (
-                    <label className="label">
-                      <span className="label-text-alt text-error">
-                        {errors.subject.message}
-                      </span>
-                    </label>
-                  )}
-                </div>
+            <div className="bg-slate-50 rounded-xl p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-700">Available Now</p>
+                <p className="text-xs text-slate-500">Students can see and apply</p>
               </div>
+              <input
+                type="checkbox"
+                className="toggle toggle-sm border-slate-300 bg-slate-300 checked:bg-indigo-600 checked:border-indigo-600"
+                {...register("availability")}
+              />
+            </div>
 
-              {/* Availability */}
-              <div className="form-control">
-                <label className="label cursor-pointer">
-                  <span className="label-text font-medium">Available Now</span>
-                  <input
-                    type="checkbox"
-                    className="toggle toggle-primary"
-                    {...register("availability")}
-                  />
-                </label>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-3 mt-6">
-                <button
-                  type="submit"
-                  className="btn btn-primary flex-1"
-                  disabled={loading}
-                >
-                  {loading && (
-                    <span className="loading loading-spinner loading-sm"></span>
-                  )}
-                  {loading ? "Updating..." : "Update Tuition"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate("/dashboard/tuitions")}
-                  className="btn btn-ghost flex-1"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
+            <div className="flex gap-3 pt-4 border-t border-slate-100">
+              <button
+                type="submit"
+                className="btn bg-indigo-600 hover:bg-indigo-700 text-white border-none flex-1"
+                disabled={loading}
+              >
+                {loading && <span className="loading loading-spinner loading-sm" />}
+                {loading ? "Updating..." : "Update Tuition"}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard/tuitions")}
+                className="btn btn-ghost flex-1"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

@@ -1,101 +1,64 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 
 const PasswordChangeForm = ({ register, errors, watch, isEditing }) => {
   const [isPasswordEditing, setIsPasswordEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const handlePasswordChangeClick = (e) => {
-    e.preventDefault();
-    setIsPasswordEditing((prev) => !prev);
-  };
+
   return (
-    <div className="mt-6 p-4 ">
-      <div>
-        <span>Want to change your password?</span>
+    <div className="mt-8 pt-6 border-t border-slate-100">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <FiLock className="w-4 h-4 text-slate-500" />
+          <span className="text-sm font-medium text-slate-700">Change Password</span>
+        </div>
         <button
-          className="btn btn-sm ms-4 bg-purple-800 hover:bg-purple-900 text-white"
-          onClick={handlePasswordChangeClick}
+          type="button"
+          className={`text-xs font-medium px-3 py-1.5 rounded-md transition-colors ${
+            isPasswordEditing
+              ? "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
+          }`}
+          onClick={(e) => { e.preventDefault(); setIsPasswordEditing((prev) => !prev); }}
         >
-          {isPasswordEditing ? "NO" : "YES"}
+          {isPasswordEditing ? "Cancel" : "Change"}
         </button>
       </div>
+
       {isPasswordEditing && (
-        <div className="space-y-3 mt-4 ms-6">
+        <div className="mt-4 space-y-4 p-4 bg-slate-50 rounded-lg">
           <div>
-            <label className="label" label="Current Password">
-              Current Password
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="current_password"
-              name="current_password"
-              disabled={!isEditing}
-              className="input input-bordered w-full mb-4"
-              {...register("current_password", {
-                required: "Current password is required",
-              })}
-            />
-            {errors.current_password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.current_password.message}
-              </p>
-            )}
+            <label className="block text-sm font-medium text-slate-700 mb-1">Current Password</label>
+            <input type={showPassword ? "text" : "password"} disabled={!isEditing}
+              className="input input-bordered w-full"
+              {...register("current_password", { required: "Current password is required" })} />
+            {errors.current_password && <p className="text-red-500 text-xs mt-1">{errors.current_password.message}</p>}
           </div>
-
-          <div>
-            <label className="label" label="New Password">
-              New Password
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="new_password"
-              name="new_password"
-              disabled={!isEditing}
-              className="input input-bordered w-full mb-4"
-              {...register("new_password", {
-                required: "New password is required",
-              })}
-            />
-            {errors.new_password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.new_password.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="label" label="Confirm Password">
-              Confirm Password
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="confirm_password"
-              name="confirm_password"
-              disabled={!isEditing}
-              className="input input-bordered w-full mb-4"
-              {...register("confirm_password", {
-                validate: (value) =>
-                  value === watch("new_password") || "Passwords do not match",
-              })}
-            />
-            {errors.confirm_password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.confirm_password.message}
-              </p>
-            )}
-          </div>
-
-          {/* show password checkbox */}
-          {isEditing && (
-            <div className="form-control">
-              <label className="label cursor-pointer">
-                <span className="label-text">Show Password</span>
-                <input
-                  type="checkbox"
-                  className="toggle"
-                  checked={showPassword}
-                  onChange={() => setShowPassword((prev) => !prev)}
-                />
-              </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">New Password</label>
+              <input type={showPassword ? "text" : "password"} disabled={!isEditing}
+                className="input input-bordered w-full"
+                {...register("new_password", { required: "New password is required" })} />
+              {errors.new_password && <p className="text-red-500 text-xs mt-1">{errors.new_password.message}</p>}
             </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Confirm Password</label>
+              <input type={showPassword ? "text" : "password"} disabled={!isEditing}
+                className="input input-bordered w-full"
+                {...register("confirm_password", {
+                  validate: (value) => value === watch("new_password") || "Passwords do not match",
+                })} />
+              {errors.confirm_password && <p className="text-red-500 text-xs mt-1">{errors.confirm_password.message}</p>}
+            </div>
+          </div>
+          {isEditing && (
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-slate-600">
+              {showPassword ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
+              <input type="checkbox" className="toggle toggle-sm" checked={showPassword}
+                onChange={() => setShowPassword((prev) => !prev)} />
+              <span>{showPassword ? "Hide" : "Show"} passwords</span>
+            </label>
           )}
         </div>
       )}

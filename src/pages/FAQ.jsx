@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { FiHelpCircle, FiChevronDown } from "react-icons/fi";
 
 const faqs = [
@@ -12,7 +12,7 @@ const faqs = [
   },
   {
     q: "Can I track my child's progress?",
-    a: "You’ll see milestones, assignments, and session notes on the enrollment dashboard, plus notifications for updates.",
+    a: "Youâ€™ll see milestones, assignments, and session notes on the enrollment dashboard, plus notifications for updates.",
   },
   {
     q: "What if I need to reschedule?",
@@ -30,10 +30,10 @@ const faqs = [
 
 const FAQ = () => {
   return (
-    <div className="bg-gradient-to-b from-slate-50 via-white to-slate-100">
+    <div className="bg-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-12 md:py-16 space-y-8">
         <header className="text-center space-y-3">
-          <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-primary text-sm font-semibold">
+          <p className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-indigo-600 text-sm font-semibold">
             <FiHelpCircle className="h-4 w-4" /> FAQs
           </p>
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
@@ -65,22 +65,22 @@ const FAQ = () => {
           ))}
         </div>
 
-        <div className="rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-blue-100 to-white p-6 shadow-sm text-center space-y-3">
+        <div className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-primary/10 via-indigo-50 to-white p-6 shadow-sm text-center space-y-3">
           <h3 className="text-lg font-semibold text-slate-900">
             Still need help?
           </h3>
           <p className="text-sm text-slate-700">
-            Reach out and we’ll guide you to the right tutor or resolve any
+            Reach out and weâ€™ll guide you to the right tutor or resolve any
             issue.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <a
               href="mailto:support@tuitionhub.com"
-              className="btn btn-primary btn-sm"
+              className="btn bg-indigo-600 hover:bg-indigo-700 text-white border-none btn-sm"
             >
               Email support
             </a>
-            <a href="/tuitions" className="btn btn-outline btn-sm">
+            <a href="/tuitions" className="btn btn-ghost border border-slate-200 btn-sm">
               Browse tutors
             </a>
           </div>
@@ -91,3 +91,4 @@ const FAQ = () => {
 };
 
 export default FAQ;
+

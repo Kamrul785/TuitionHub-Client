@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import useAuthContext from "../hooks/useAuthContext";
 import StatCard from "../components/Dashboard/StatCard";
 import ApplicationsPanel from "../components/Dashboard/ApplicationsPanel";
+import { StatCardSkeleton, TableSkeleton } from "../components/ui/Skeleton";
+import SectionHeader from "../components/ui/SectionHeader";
 
 export default function Dashboard() {
   const { 
@@ -34,6 +36,7 @@ export default function Dashboard() {
   });
 
   const [applications, setApplications] = useState([]);
+  const [tuitionTutorMap, setTuitionTutorMap] = useState({});
   const [statsLoading, setStatsLoading] = useState(true);
 
   const role = user?.role;  
@@ -43,44 +46,49 @@ export default function Dashboard() {
       setStatsLoading(true);
       try {
         if (role === "Tutor") {
-          const tutionsData = await fetchTuitions();
+          // Fetch tuitions, applications, and enrollments in PARALLEL
+          const [tutionsData, applicationsData, enrollmentsData] =
+            await Promise.all([
+              fetchTuitions(),
+              fetchApplications(),
+              fetchEnrollments(),
+            ]);
+
           const allTuitions = tutionsData.results || tutionsData || [];
           const myTuitions = allTuitions.filter(
             (tuition) => tuition.tutor_email === user?.email
           );
+          const myTuitionIds = new Set(myTuitions.map((t) => t.id));
 
-          const applicationsData = await fetchApplications();
           const allApplications = applicationsData.results || applicationsData || [];
           const pendingApps = allApplications.filter(
             (app) => app.status === "PENDING"
           );
-
-          // Set applications for display (limit to last 10)
           setApplications(allApplications.slice(0, 10));
 
-          // Count total students enrolled
-          let totalStudents = 0;
-          let totalAssignments = 0;
+          // Filter enrollments for my tuitions (single fetch, no loop)
+          const allEnrollments = enrollmentsData.results || enrollmentsData || [];
+          const myEnrollments = allEnrollments.filter(
+            (e) => myTuitionIds.has(e.tuition)
+          );
 
-          for (const tuition of myTuitions) {
-            const enrollmentsData = await fetchEnrollments();
-            const enrollments = enrollmentsData.results || enrollmentsData || [];
-            const tuitionEnrollments = enrollments.filter(
-              (enroll) => enroll.tuition === tuition.id
-            );
-            totalStudents += tuitionEnrollments.length;
+          // Fetch assignments for all enrollments in PARALLEL
+          const assignmentResults = await Promise.all(
+            myEnrollments.map((e) => fetchAssignments(e.id).catch(() => []))
+          );
+          const totalAssignments = assignmentResults.reduce((sum, data) => {
+            const assignments = data.results || data || [];
+            return sum + assignments.length;
+          }, 0);
 
-            // Count assignments for this tuition's enrollments
-            for (const enrollment of tuitionEnrollments) {
-              const assignmentsData = await fetchAssignments(enrollment.id);
-              const assignments = assignmentsData.results || assignmentsData || [];
-              totalAssignments += assignments.length;
-            }
-          }
+          // Build tutor map for ApplicationsPanel
+          const map = {};
+          allTuitions.forEach((t) => { map[t.id] = t.tutor_email || "-"; });
+          setTuitionTutorMap(map);
 
           setStats({
             tuitionsCreated: myTuitions.length,
-            studentsEnrolled: totalStudents,
+            studentsEnrolled: myEnrollments.length,
             assignmentsCreated: totalAssignments,
             pendingApplicants: pendingApps.length,
             applicationsSent: "--",
@@ -89,28 +97,29 @@ export default function Dashboard() {
             reviewsPending: "--",
           });
         } else {
-          // Fetch student stats
-          const applicationsData = await fetchApplications();
-          const allApplications = applicationsData.results || applicationsData || [];
+          // STUDENT: Fetch applications, enrollments, and reviews in PARALLEL
+          const [applicationsData, enrollmentsData, myReviews] =
+            await Promise.all([
+              fetchApplications(),
+              fetchEnrollments(),
+              fetchMyReviews(),
+            ]);
 
-          // Set applications for display (limit to last 10)
+          const allApplications = applicationsData.results || applicationsData || [];
           setApplications(allApplications.slice(0, 10));
 
-          const enrollmentsData = await fetchEnrollments();
           const enrollments = enrollmentsData.results || enrollmentsData || [];
 
-          // Count total assignments due
-          let totalAssignments = 0;
-          for (const enrollment of enrollments) {
-            const assignmentsData = await fetchAssignments(enrollment.id);
-            const assignments = assignmentsData.results || assignmentsData || [];
-            totalAssignments += assignments.length;
-          }
+          // Fetch assignments for all enrollments in PARALLEL
+          const assignmentResults = await Promise.all(
+            enrollments.map((e) => fetchAssignments(e.id).catch(() => []))
+          );
+          const totalAssignments = assignmentResults.reduce((sum, data) => {
+            const assignments = data.results || data || [];
+            return sum + assignments.length;
+          }, 0);
 
-          // Count reviews pending (enrolled tuitions without review)
-          const reviewsData = await fetchMyReviews();
-          const myReviews = reviewsData || [];
-          const reviewedTuitionIds = myReviews.map((review) => review.tuition);
+          const reviewedTuitionIds = (myReviews || []).map((review) => review.tuition);
           const reviewsPending = enrollments.filter(
             (enrollment) => !reviewedTuitionIds.includes(enrollment.tuition)
           ).length;
@@ -139,74 +148,22 @@ export default function Dashboard() {
   }, [user, loadingUser, role, fetchTuitions, fetchApplications, fetchEnrollments, fetchAssignments, fetchMyReviews]);
 
   if (loadingUser) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <span className="loading loading-spinner loading-lg" />
-      </div>
-    );
+    return null;
   }
 
   const statCards =
     role === "Tutor"
       ? [
-          {
-            icon: FiBookOpen,
-            label: "Tuitions Created",
-            value: stats.tuitionsCreated,
-            badge: "Total posted",
-            badgeClass: "badge badge-outline text-xs",
-          },
-          {
-            icon: FiUsers,
-            label: "Students Enrolled",
-            value: stats.studentsEnrolled,
-            badge: "Across tuitions",
-            badgeClass: "badge badge-outline text-xs",
-          },
-          {
-            icon: FiPlusCircle,
-            label: "Assignments Created",
-            value: stats.assignmentsCreated,
-            badge: "All topics",
-            badgeClass: "badge badge-outline text-xs",
-          },
-          {
-            icon: FiShoppingCart,
-            label: "Pending Applicants",
-            value: stats.pendingApplicants,
-            badge: "Need review",
-            badgeClass: "badge badge-outline text-xs",
-          },
+          { icon: FiBookOpen, label: "Tuitions Created", value: stats.tuitionsCreated, badge: "Total" },
+          { icon: FiUsers, label: "Students Enrolled", value: stats.studentsEnrolled, badge: "Active" },
+          { icon: FiPlusCircle, label: "Assignments", value: stats.assignmentsCreated, badge: "Created" },
+          { icon: FiShoppingCart, label: "Pending Applicants", value: stats.pendingApplicants, badge: "Review" },
         ]
       : [
-          {
-            icon: FiShoppingCart,
-            label: "Applications Sent",
-            value: stats.applicationsSent,
-            badge: "Submitted",
-            badgeClass: "badge badge-outline text-xs",
-          },
-          {
-            icon: FiBookOpen,
-            label: "Enrolled Tuitions",
-            value: stats.enrolledTuitions,
-            badge: "Active",
-            badgeClass: "badge badge-outline text-xs",
-          },
-          {
-            icon: FiPlusCircle,
-            label: "Assignments Due",
-            value: stats.assignmentsDue,
-            badge: "Upcoming",
-            badgeClass: "badge badge-outline text-xs",
-          },
-          {
-            icon: FiStar,
-            label: "Reviews Pending",
-            value: stats.reviewsPending,
-            badge: "After selection",
-            badgeClass: "badge badge-outline text-xs",
-          },
+          { icon: FiShoppingCart, label: "Applications Sent", value: stats.applicationsSent, badge: "Total" },
+          { icon: FiBookOpen, label: "Enrolled Tuitions", value: stats.enrolledTuitions, badge: "Active" },
+          { icon: FiPlusCircle, label: "Assignments Due", value: stats.assignmentsDue, badge: "Pending" },
+          { icon: FiStar, label: "Reviews Pending", value: stats.reviewsPending, badge: "To do" },
         ];
 
   const activityTitle = "Recent Applications";
@@ -216,16 +173,24 @@ export default function Dashboard() {
       : ["Application ID", "Tuition", "Tutor", "Status", "Date"];
 
   return (
-    <div>
+    <div className="space-y-6">
+      <SectionHeader
+        title={`Welcome back, ${user?.first_name || "there"}`}
+        description={`Here's what's happening with your ${role === "Tutor" ? "tuitions" : "learning"} today.`}
+      />
+
       {statsLoading ? (
-        // Show loading spinner while fetching data
-        <div className="flex items-center justify-center py-20">
-          <span className="loading loading-spinner loading-lg text-primary" />
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <StatCardSkeleton key={i} />
+            ))}
+          </div>
+          <TableSkeleton rows={5} cols={5} />
         </div>
       ) : (
         <>
-          {/* Stats Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
             {statCards.map((card, index) => (
               <StatCard
                 key={index}
@@ -233,17 +198,16 @@ export default function Dashboard() {
                 label={card.label}
                 value={card.value}
                 badge={card.badge}
-                badgeClass={card.badgeClass}
               />
             ))}
           </div>
 
-          {/* Applications Panel */}
           <ApplicationsPanel
             role={role}
             activityTitle={activityTitle}
             activityColumns={activityColumns}
             applications={applications}
+            tuitionTutorMap={tuitionTutorMap}
           />
         </>
       )}

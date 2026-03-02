@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import ShinyText from "../components/Animations/ShinyText";
+﻿import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import useAuthContext from "../hooks/useAuthContext";
+import { Link } from "react-router";
+import { useToast } from "../components/ui/Toast";
 
 const Register = () => {
   const [loading, setLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
+  const toast = useToast();
   const {
     register,
     handleSubmit,
@@ -14,269 +15,176 @@ const Register = () => {
   } = useForm();
 
   const { registerUser, errorMsg } = useAuthContext();
+
   const onSubmit = async (data) => {
     delete data.confirm_password;
     setLoading(true);
     try {
       const result = await registerUser(data);
       if (result.success) {
-        setSuccessMsg(result.message);
-        // setTimeout(() => {
-        //   navigate("/login");
-        // }, 3000);
+        toast.success(result.message || "Registration successful! Check your email.");
       }
     } catch (error) {
-      console.log("Registration error:", error);
+      toast.error("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  const FieldError = ({ error }) =>
+    error ? <p className="text-xs text-red-500 mt-1">{error.message}</p> : null;
+
   return (
-    <div className="min-h-screen bg-linear-to-b from-blue-50 via-white to-blue-100 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="bg-white border border-blue-100 p-8 rounded-2xl shadow-xl">
-          <div className="mb-6 text-center">
-            <p>
-              <ShinyText
-                text="Welcome to Tuition Hub"
-                speed={3}
-                delay={0.5}
-                color="#3b25c1"
-                shineColor="#ffffff"
-                spread={120}
-                direction="left"
-                yoyo={false}
-                pauseOnHover
-                disabled={false}
-              />
-            </p>
-            <h1 className="text-2xl md:text-3xl font-bold mt-2">Register</h1>
-            <p className="text-slate-500 text-sm mt-2">
-              Please fill in the form to create an account.
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <Link to="/" className="text-xl font-bold text-indigo-600 tracking-tight">
+            TuitionHub
+          </Link>
+        </div>
+
+        <div className="card-modern p-7">
+          <div className="mb-6">
+            <h1 className="text-xl font-bold text-slate-900">Create account</h1>
+            <p className="text-sm text-slate-400 mt-1">
+              Fill in the details to get started
             </p>
           </div>
-          {/* error msg and success msg  */}
+
           {errorMsg && (
-            <div className="alert alert-error mb-4 text-sm">
-              <span>{errorMsg}</span>
-            </div>
+            <div className="p-3 rounded-lg bg-red-50 border border-red-100 text-sm text-red-600 mb-4">{errorMsg}</div>
           )}
-          {successMsg && (
-            <div className="alert alert-success mb-4 text-sm">
-              <span>{successMsg}</span>
-            </div>
-          )}
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="form-control">
-              <label className="label" htmlFor="first_name">
-                <span className="label-text text-sm font-medium text-gray-500">
-                  First Name
-                </span>
-              </label>
-              <input
-                type="text"
-                id="first_name"
-                placeholder="John"
-                className={`input input-bordered w-full ${errors.first_name ? "input-error" : ""}`}
-                {...register("first_name", {
-                  required: "First name is required",
-                })}
-              />
-              {errors.first_name && (
-                <span className="text-sm text-red-500 mt-1">
-                  {errors.first_name.message}
-                </span>
-              )}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">First Name</label>
+                <input
+                  type="text"
+                  placeholder="John"
+                  className="input input-bordered w-full"
+                  {...register("first_name", { required: "Required" })}
+                />
+                <FieldError error={errors.first_name} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Last Name</label>
+                <input
+                  type="text"
+                  placeholder="Doe"
+                  className="input input-bordered w-full"
+                  {...register("last_name", { required: "Required" })}
+                />
+                <FieldError error={errors.last_name} />
+              </div>
             </div>
-            <div className="form-control">
-              <label className="label" htmlFor="last_name">
-                <span className="label-text text-sm font-medium text-gray-500">
-                  Last Name
-                </span>
-              </label>
-              <input
-                type="text"
-                id="last_name"
-                placeholder="Doe"
-                className={`input input-bordered w-full ${errors.last_name ? "input-error" : ""}`}
-                {...register("last_name", {
-                  required: "Last name is required",
-                })}
-              />
-              {errors.last_name && (
-                <span className="text-sm text-red-500 mt-1">
-                  {errors.last_name.message}
-                </span>
-              )}
-            </div>
-            <div className="form-control">
-              <label className="label" htmlFor="email">
-                <span className="label-text text-sm font-medium text-gray-500">
-                  Email
-                </span>
-              </label>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
               <input
                 type="email"
-                id="email"
                 placeholder="you@example.com"
-                className={`input input-bordered w-full ${errors.email ? "input-error" : ""}`}
+                className="input input-bordered w-full"
                 {...register("email", {
                   required: "Email is required",
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "Please enter a valid email address",
-                  },
+                  pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email" },
                 })}
               />
-              {errors.email && (
-                <span className="text-sm text-red-500 mt-1">
-                  {errors.email.message}
-                </span>
-              )}{" "}
+              <FieldError error={errors.email} />
             </div>
-            <div className="form-control">
-              <label className="label" htmlFor="address">
-                <span className="label-text text-sm font-medium text-gray-500">
-                  Address
-                </span>
-              </label>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Address</label>
               <input
                 type="text"
-                id="address"
                 placeholder="123 Main St"
                 className="input input-bordered w-full"
                 {...register("address")}
               />
-              {errors.address && (
-                <span className="text-sm text-red-500 mt-1">
-                  {errors.address.message}
-                </span>
-              )}
             </div>
-            <div className="form-control">
-              <label className="label" htmlFor="phone_number">
-                <span className="label-text text-sm font-medium text-gray-500">
-                  Phone Number
-                </span>
-              </label>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Phone</label>
               <input
                 type="tel"
-                id="phone_number"
-                placeholder="123-456-7890"
+                placeholder="01X-XXXX-XXXX"
                 className="input input-bordered w-full"
                 {...register("phone_number")}
               />
             </div>
-            <div className="form-control">
-              <span className="label-text text-sm font-medium text-gray-500">
-                Role
-              </span>
-              <div className="mt-2 flex items-center gap-4">
-                <label
-                  className="inline-flex items-center gap-2 cursor-pointer"
-                  htmlFor="role"
-                >
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Role</label>
+              <div className="flex gap-4 p-3 rounded-lg bg-slate-50 border border-slate-100">
+                <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
                     value="User"
-                    className="radio radio-primary"
+                    className="radio radio-sm border-slate-300 checked:bg-indigo-600"
                     {...register("role", { required: "Role is required" })}
                   />
-                  <span className="text-sm text-gray-700">Student</span>
+                  <span className="text-sm text-slate-700">Student</span>
                 </label>
-                <label
-                  className="inline-flex items-center gap-2 cursor-pointer"
-                  htmlFor="role"
-                >
+                <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
                     value="Tutor"
-                    className="radio radio-primary"
+                    className="radio radio-sm border-slate-300 checked:bg-indigo-600"
                     {...register("role", { required: "Role is required" })}
                   />
-                  <span className="text-sm text-gray-700">Teacher</span>
+                  <span className="text-sm text-slate-700">Teacher</span>
                 </label>
               </div>
-              {errors.role && (
-                <span className="text-sm text-red-500 mt-1">
-                  {errors.role.message}
-                </span>
-              )}
+              <FieldError error={errors.role} />
             </div>
+
             <div>
-              <label className="form-control" htmlFor="password">
-                <span className="label-text text-sm font-medium text-gray-500">
-                  Password
-                </span>
-              </label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
               <input
                 type="password"
-                id="password"
-                placeholder="********"
-                className={`input input-bordered w-full ${errors.password ? "input-error" : ""}`}
+                placeholder="Min 8 characters"
+                className="input input-bordered w-full"
                 {...register("password", {
                   required: "Password is required",
-                  minLength: {
-                    value: 8,
-                    message: "Password must be at least 8 characters",
-                  },
+                  minLength: { value: 8, message: "Min 8 characters" },
                 })}
               />
-              {errors.password && (
-                <span className="text-sm text-red-500 mt-1">
-                  {errors.password.message}
-                </span>
-              )}
+              <FieldError error={errors.password} />
             </div>
+
             <div>
-              <label className="form-control" htmlFor="confirmPassword">
-                <span className="label-text text-sm font-medium text-gray-500">
-                  Confirm Password
-                </span>
-              </label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Confirm Password</label>
               <input
                 type="password"
-                id="confirmPassword"
                 placeholder="Re-enter password"
-                className={`input input-bordered w-full ${errors.confirm_password ? "input-error" : ""}`}
+                className="input input-bordered w-full"
                 {...register("confirm_password", {
-                  required: "Please confirm your password",
-                  validate: (value) =>
-                    value === watch("password") ||
-                    "Confirm passwords do not match",
+                  required: "Please confirm password",
+                  validate: (value) => value === watch("password") || "Passwords don't match",
                 })}
               />
-              {errors.confirm_password && (
-                <span className="text-sm text-red-500 mt-1">
-                  {errors.confirm_password.message}
-                </span>
-              )}
+              <FieldError error={errors.confirm_password} />
             </div>
+
             <button
               type="submit"
-              className="btn btn-primary w-full"
+              className="btn bg-indigo-600 hover:bg-indigo-700 text-white border-0 w-full"
               disabled={loading}
             >
-              {loading && <span className="loading loading-spinner"></span>}
-              {loading ? "Registering..." : "Register"}
-            </button>{" "}
+              {loading && <span className="loading loading-spinner loading-sm"></span>}
+              {loading ? "Creating account..." : "Create Account"}
+            </button>
           </form>
-          <div>
-            <p className="text-sm text-center mt-4">
+
+          <div className="mt-5 space-y-2 text-center">
+            <p className="text-sm text-slate-400">
               Already have an account?{" "}
-              <a href="/login" className="text-primary">
-                {" "}
-                Login here
-              </a>
+              <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-700">Sign in</Link>
             </p>
-          </div>
-          <div>
-            <p className="text-sm text-center mt-4">
-              Haven't received activation email?{" "}
-              <a href="/resend-activation" className="text-primary">
-                {" "}
-                Resend Activation Email
-              </a>
+            <p className="text-xs text-slate-400">
+              <Link to="/resend-activation" className="hover:text-indigo-600 transition-colors">
+                Resend activation email
+              </Link>
             </p>
           </div>
         </div>

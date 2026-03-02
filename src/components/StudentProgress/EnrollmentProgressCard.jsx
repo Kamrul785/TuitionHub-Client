@@ -1,94 +1,72 @@
-import { FiCheckCircle, FiCircle } from "react-icons/fi";
+import { FiCheckSquare, FiBookOpen } from "react-icons/fi";
+
+const ProgressBar = ({ label, icon: Icon, percentage, completed, total, color }) => (
+  <div className="mb-4">
+    <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center gap-2">
+        <Icon className={`h-4 w-4 text-${color}-600`} />
+        <span className="text-sm font-medium text-slate-700">{label}</span>
+      </div>
+      <span className="text-sm font-semibold text-slate-900">{percentage}%</span>
+    </div>
+    <div className="flex items-center gap-3">
+      <div className="flex-1 bg-slate-100 rounded-full h-2">
+        <div
+          className={`bg-${color}-500 h-2 rounded-full transition-all duration-500 ease-out`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+      <span className="text-xs text-slate-500 w-12 text-right tabular-nums">
+        {completed}/{total}
+      </span>
+    </div>
+  </div>
+);
 
 const EnrollmentProgressCard = ({ enrollment, progress }) => {
+  const overall = Math.round(
+    (progress.assignments.percentage + progress.topics.percentage) / 2,
+  );
+
   return (
-    <div>
-      <div className="card-body">
-        <h3 className="card-title text-lg text-slate-800">
+    <div className="card-modern-interactive p-5">
+      <div className="mb-4">
+        <h3 className="text-base font-semibold text-slate-900 mb-1">
           {enrollment.tuition_title}
         </h3>
-        <p className="text-sm text-slate-500 mb-4">
-          Tutor: {enrollment.tuition.__tutor_email}
+        <p className="text-xs text-slate-500">
+          Tutor: {enrollment.tuition_tutor_email || enrollment.tuition?.__tutor_email || "N/A"}
         </p>
+      </div>
 
-        {/* Assignments Progress */}
-        <div className="mb-5">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <FiCheckCircle className="text-green-600" />
-              <span className="text-sm font-medium text-slate-700">
-                Assignments
-              </span>
-            </div>
-            <span className="text-sm font-bold text-slate-800">
-              {progress.assignments.percentage}%
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 bg-slate-200 rounded-full h-2">
-              <div
-                className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${progress.assignments.percentage}%`,
-                }}
-              ></div>
-            </div>
-            <span className="text-xs text-slate-600 w-16 text-right">
-              {progress.assignments.completed}/{progress.assignments.total}
-            </span>
-          </div>
+      <ProgressBar
+        label="Assignments"
+        icon={FiCheckSquare}
+        percentage={progress.assignments.percentage}
+        completed={progress.assignments.completed}
+        total={progress.assignments.total}
+        color="emerald"
+      />
+
+      <ProgressBar
+        label="Topics"
+        icon={FiBookOpen}
+        percentage={progress.topics.percentage}
+        completed={progress.topics.completed}
+        total={progress.topics.total}
+        color="violet"
+      />
+
+      <div className="pt-3 border-t border-slate-100">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Overall</span>
+          <span className="text-xs font-bold text-indigo-600">{overall}%</span>
         </div>
-
-        {/* Topics Progress */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <FiCircle className="text-purple-600" />
-              <span className="text-sm font-medium text-slate-700">Topics</span>
-            </div>
-            <span className="text-sm font-bold text-slate-800">
-              {progress.topics.percentage}%
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 bg-slate-200 rounded-full h-2">
-              <div
-                className="bg-purple-500 h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${progress.topics.percentage}%`,
-                }}
-              ></div>
-            </div>
-            <span className="text-xs text-slate-600 w-16 text-right">
-              {progress.topics.completed}/{progress.topics.total}
-            </span>
-          </div>
-        </div>
-
-        {/* Overall Enrollment Progress */}
-        <div className="mt-4 pt-4 border-t border-slate-200">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-slate-600">OVERALL</span>
-            <span className="text-xs font-bold text-slate-800">
-              {Math.round(
-                (progress.assignments.percentage + progress.topics.percentage) /
-                  2,
-              )}
-              %
-            </span>
-          </div>
-          <div className="bg-slate-200 rounded-full h-2">
-            <div
-              className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-              style={{
-                width: `${Math.round(
-                  (progress.assignments.percentage +
-                    progress.topics.percentage) /
-                    2,
-                )}%`,
-              }}
-            ></div>
-          </div>
+        <div className="bg-slate-100 rounded-full h-2">
+          <div
+            className="bg-indigo-600 h-2 rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${overall}%` }}
+          />
         </div>
       </div>
     </div>

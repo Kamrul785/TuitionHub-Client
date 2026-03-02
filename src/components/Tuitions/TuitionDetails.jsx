@@ -5,9 +5,14 @@ import useAuthContext from "../../hooks/useAuthContext";
 import TuitionHeader from "./TuitionHeader";
 import TuitionInfo from "./TuitionInfo";
 import ReviewSection from "./ReviewSection";
+import { useToast } from "../ui/Toast";
+import Skeleton from "../ui/Skeleton";
+import EmptyState from "../ui/EmptyState";
+import { FiAlertCircle } from "react-icons/fi";
 
 const TuitionDetails = () => {
   const { id } = useParams();
+  const toast = useToast();
   const {
     user,
     fetchApplications,
@@ -144,13 +149,12 @@ const TuitionDetails = () => {
 
   const handleApply = async () => {
     if (!user) {
-      alert("Please login to apply for tuition.");
+      toast.error("Please login to apply for tuition.");
       return;
     }
 
-    // Don't allow applying if already has PENDING or ACCEPTED application
     if (applicationStatus && applicationStatus.status !== "REJECTED") {
-      alert("You have already applied for this tuition.");
+      toast.info("You have already applied for this tuition.");
       return;
     }
 
@@ -158,12 +162,12 @@ const TuitionDetails = () => {
     const result = await applyForTuition(tuition.id);
 
     if (result?.success === false) {
-      alert("Failed to apply for tuition.");
+      toast.error("Failed to apply for tuition.");
     } else if (result?.id) {
       setApplicationStatus(result);
-      alert("Successfully applied for tuition!");
+      toast.success("Successfully applied for tuition!");
     } else {
-      alert("Application submitted. Please check your applications.");
+      toast.info("Application submitted. Check your applications.");
     }
 
     setApplying(false);
@@ -228,8 +232,29 @@ const TuitionDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <span className="loading loading-spinner loading-lg text-info"></span>
+      <div className="min-h-screen bg-slate-50">
+        <div className="bg-white border-b border-slate-200">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-3">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-8 w-3/4" />
+            <div className="flex gap-2">
+              <Skeleton className="h-6 w-20 rounded-md" />
+              <Skeleton className="h-6 w-20 rounded-md" />
+              <Skeleton className="h-6 w-16 rounded-md" />
+            </div>
+          </div>
+        </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+          <div className="card-modern p-6 md:p-8 space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-20 rounded-lg" />
+              ))}
+            </div>
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -237,14 +262,13 @@ const TuitionDetails = () => {
   if (error || !tuition) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-        <div className="max-w-lg w-full bg-white border border-slate-200 rounded-2xl shadow-sm p-6 text-center">
-          <p className="text-red-600 font-semibold mb-4">
-            {error || "Tuition not found."}
-          </p>
-          <Link to="/tuitions" className="btn btn-primary">
-            Back to Tuitions
-          </Link>
-        </div>
+        <EmptyState
+          icon={FiAlertCircle}
+          title={error || "Tuition not found"}
+          description="The tuition you're looking for doesn't exist or has been removed."
+          actionLabel="Back to Tuitions"
+          actionTo="/tuitions"
+        />
       </div>
     );
   }
@@ -253,11 +277,11 @@ const TuitionDetails = () => {
     !applicationStatus || applicationStatus.status === "REJECTED";
 
   return (
-    <div className="bg-linear-to-b from-blue-50 via-white to-blue-100 min-h-screen">
+    <div className="min-h-screen bg-slate-50">
       <TuitionHeader tuition={tuition} />
 
-      <section className="max-w-5xl mx-auto px-4 py-10">
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+        <div className="card-modern p-6 md:p-8">
           <TuitionInfo
             tuition={tuition}
             onApply={handleApply}

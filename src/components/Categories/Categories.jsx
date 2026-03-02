@@ -13,8 +13,11 @@ import Card from "./Card";
 
 const Categories = () => {
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-16">
-      <h1 className="text-3xl font-bold mb-8">Tuition <span className="text-blue-600">Categories</span></h1>
+    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="mb-8">
+        <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600 mb-3">Categories</div>
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Tuition Categories</h2>
+      </div>
       <Swiper
         slidesPerView="auto"
         spaceBetween={16}
@@ -34,7 +37,7 @@ const Categories = () => {
           </SwiperSlide>
         ))}
       </Swiper>
-    </div>
+    </section>
   );
 };
 export default Categories;

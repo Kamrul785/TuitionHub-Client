@@ -1,26 +1,32 @@
 import React from "react";
 import ReviewItem from "./ReviewItem";
+import Skeleton from "../ui/Skeleton";
 
 const ReviewList = ({ reviews, loading, error, currentUserId, onUpdate, onDelete }) => {
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-slate-600">
-        <span className="loading loading-spinner loading-sm"></span>
-        Loading reviews...
+      <div className="space-y-3">
+        {[...Array(2)].map((_, i) => (
+          <div key={i} className="p-4 rounded-lg border border-slate-100">
+            <Skeleton className="h-4 w-24 mb-2" />
+            <Skeleton className="h-3 w-full mb-1" />
+            <Skeleton className="h-3 w-2/3" />
+          </div>
+        ))}
       </div>
     );
   }
 
   if (error) {
-    return <div className="alert alert-error text-sm">{error}</div>;
+    return <div className="p-3 rounded-lg bg-red-50 border border-red-100 text-sm text-red-600">{error}</div>;
   }
 
   if (reviews.length === 0) {
-    return <div className="text-slate-500">No reviews yet.</div>;
+    return <p className="text-sm text-slate-400">No reviews yet.</p>;
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {reviews.map((review) => (
         <ReviewItem
           key={review.id}

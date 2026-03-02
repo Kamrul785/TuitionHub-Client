@@ -1,20 +1,12 @@
-import { useEffect, useState } from "react";
-import apiClient from "../../services/api-client";
+import React from "react";
 
-const ApplicationsPanel = ({ role, activityTitle, activityColumns, applications = [] }) => {
-  const [tuitionTutorMap, setTuitionTutorMap] = useState({});
-  const getStatusColor = (status) => {
-    switch (status?.toUpperCase()) {
-      case "PENDING":
-        return { border: "border-warning", text: "text-warning" };
-      case "ACCEPTED":
-        return { border: "border-success", text: "text-success" };
-      case "REJECTED":
-        return { border: "border-error", text: "text-error" };
-      default:
-        return { border: "border-slate-300", text: "text-slate-600" };
-    }
-  };
+const statusStyles = {
+  PENDING: "status-badge-warning",
+  ACCEPTED: "status-badge-success",
+  REJECTED: "status-badge-error",
+};
+
+const ApplicationsPanel = ({ role, activityTitle, activityColumns, applications = [], tuitionTutorMap = {} }) => {
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -25,106 +17,70 @@ const ApplicationsPanel = ({ role, activityTitle, activityColumns, applications 
     });
   };
 
-  useEffect(() => {
-    const fetchTuitionTutors = async () => {
-      try {
-        const response = await apiClient.get("/tuitions/");
-        const tuitions = response.data?.results || response.data || [];
-        const map = tuitions.reduce((acc, tuition) => {
-          acc[tuition.id] = tuition.tutor_email || "-";
-          return acc;
-        }, {});
-        setTuitionTutorMap(map);
-      } catch (error) {
-        setTuitionTutorMap({});
-      }
-    };
-
-    fetchTuitionTutors();
-  }, []);
-
   return (
-    <div className="mt-6 card bg-white/90 backdrop-blur shadow-sm border border-slate-200">
-      <div className="card-body">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <div className="card-modern overflow-hidden">
+      <div className="p-5 border-b border-slate-100">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">
-              Recent Activity
-            </p>
-            <h3 className="card-title text-lg">{activityTitle}</h3>
-          </div>
-          <div className="join join-horizontal">
-            <button className="btn btn-ghost btn-sm join-item">
-              Last 30 days
-            </button>
-            <button className="btn btn-outline btn-sm join-item">
-              Quarter
-            </button>
+            <h3 className="text-base font-semibold text-slate-800">{activityTitle}</h3>
+            <p className="text-sm text-slate-400 mt-0.5">Most recent activity</p>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="table">
-            <thead className="text-slate-500 text-xs uppercase">
+      </div>
+      <div className="overflow-x-auto">
+        <table className="table">
+          <thead>
+            <tr>
+              {activityColumns.map((col) => (
+                <th key={col} className="text-[11px] uppercase tracking-wider font-semibold text-slate-400 bg-slate-50/60 py-3">
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {applications && applications.length > 0 ? (
+              applications.map((app) => {
+                const badgeClass = statusStyles[app.status?.toUpperCase()] || "status-badge-default";
+                return (
+                  <tr key={app.id} className="hover:bg-slate-50/50 transition-colors">
+                    {role === "Tutor" ? (
+                      <>
+                        <td className="font-medium text-slate-800">#{app.id}</td>
+                        <td className="text-slate-600">{app.applicant_email || "-"}</td>
+                        <td className="text-slate-600">{app.tuition_title || "-"}</td>
+                        <td>
+                          <span className={badgeClass}>{app.status || "-"}</span>
+                        </td>
+                        <td className="text-slate-500 text-sm">{formatDate(app.applied_at)}</td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="font-medium text-slate-800">#{app.id}</td>
+                        <td className="text-slate-600">{app.tuition_title || "-"}</td>
+                        <td className="text-slate-600">
+                          {typeof app.tuition === "object"
+                            ? app.tuition?.tutor_email || "-"
+                            : tuitionTutorMap[app.tuition] || "-"}
+                        </td>
+                        <td>
+                          <span className={badgeClass}>{app.status || "-"}</span>
+                        </td>
+                        <td className="text-slate-500 text-sm">{formatDate(app.applied_at)}</td>
+                      </>
+                    )}
+                  </tr>
+                );
+              })
+            ) : (
               <tr>
-                {activityColumns.map((col) => (
-                  <th key={col} className="bg-slate-50">
-                    {col}
-                  </th>
-                ))}
+                <td colSpan={activityColumns.length} className="text-center text-slate-400 py-12">
+                  No applications found
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {applications && applications.length > 0 ? (
-                applications.map((app) => {
-                  const statusColor = getStatusColor(app.status);
-                  return (
-                    <tr key={app.id} className="hover:bg-slate-50">
-                      {role === "Tutor" ? (
-                        <>
-                          <td className="font-semibold">#{app.id}</td>
-                          <td>{app.applicant_email  || "-"}</td>
-                          <td>{app.tuition_title ||  "-"}</td>
-                          <td>
-                            <div
-                              className={`border ${statusColor.border} w-fit rounded-full px-3 py-1 text-center text-sm font-medium ${statusColor.text}`}
-                            >
-                              {app.status || "-"}
-                            </div>
-                          </td>
-                          <td>{formatDate(app.applied_at)}</td>
-                        </>
-                      ) : (
-                        <>
-                          <td className="font-semibold">#{app.id}</td>
-                          <td>{app.tuition_title ||  "-"}</td>
-                          <td>
-                            {typeof app.tuition === "object"
-                              ? app.tuition?.tutor_email || "-"
-                              : tuitionTutorMap[app.tuition] || "-"}
-                          </td>
-                          <td>
-                            <div
-                              className={`border ${statusColor.border} w-fit rounded-full px-3 py-1 text-center text-sm font-medium ${statusColor.text}`}
-                            >
-                              {app.status || "-"}
-                            </div>
-                          </td>
-                          <td>{formatDate(app.applied_at)}</td>
-                        </>
-                      )}
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={activityColumns.length} className="text-center text-slate-500 py-8">
-                    No applications found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

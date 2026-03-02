@@ -1,6 +1,6 @@
 import React from "react";
 
-const StarRating = ({ rating, onRatingChange, interactive = false, size = "text-4xl" }) => {
+const StarRating = ({ rating, onRatingChange, interactive = false, size = "text-xl" }) => {
   const renderStars = () =>
     Array.from({ length: 5 }).map((_, index) => {
       if (interactive) {
@@ -9,23 +9,9 @@ const StarRating = ({ rating, onRatingChange, interactive = false, size = "text-
             key={index}
             type="button"
             onClick={() => onRatingChange(index + 1)}
-            onMouseEnter={(e) => {
-              const stars = e.currentTarget.parentElement.querySelectorAll("button");
-              stars.forEach((star, i) => {
-                star.classList.toggle("text-yellow-400", i <= index);
-                star.classList.toggle("text-slate-300", i > index);
-              });
-            }}
-            onMouseLeave={(e) => {
-              const stars = e.currentTarget.parentElement.querySelectorAll("button");
-              stars.forEach((star, i) => {
-                star.classList.toggle("text-yellow-500", i < rating);
-                star.classList.toggle("text-slate-300", i >= rating);
-              });
-            }}
-            className={`${size} transition-colors ${
-              index < rating ? "text-yellow-500" : "text-slate-300"
-            } hover:scale-110 focus:outline-none`}
+            className={`${size} transition-all duration-150 ${
+              index < rating ? "text-amber-400" : "text-slate-200"
+            } hover:scale-110 hover:text-amber-400 focus:outline-none`}
           >
             ★
           </button>
@@ -35,14 +21,14 @@ const StarRating = ({ rating, onRatingChange, interactive = false, size = "text-
       return (
         <span
           key={index}
-          className={index < rating ? "text-yellow-500" : "text-slate-300"}
+          className={`text-sm ${index < rating ? "text-amber-400" : "text-slate-200"}`}
         >
           ★
         </span>
       );
     });
 
-  return <div className="flex gap-1">{renderStars()}</div>;
+  return <div className="flex gap-0.5">{renderStars()}</div>;
 };
 
 export default StarRating;

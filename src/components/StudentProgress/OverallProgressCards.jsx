@@ -1,59 +1,45 @@
 import React from "react";
-import { FiTrendingUp } from "react-icons/fi";
+import { FiTrendingUp, FiCheckSquare, FiBookOpen, FiUsers } from "react-icons/fi";
+
+const StatItem = ({ icon: Icon, label, value, sub, color }) => (
+  <div className={`rounded-xl bg-${color}-50 p-4 border border-${color}-100`}>
+    <div className="flex items-center gap-2 mb-2">
+      <Icon className={`h-4 w-4 text-${color}-600`} />
+      <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">{label}</p>
+    </div>
+    <p className={`text-2xl font-bold text-${color}-600`}>{value}</p>
+    {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
+  </div>
+);
 
 const OverallProgressCards = ({ overallProgress, stats, enrollments }) => {
   return (
-    <div>
-      <div className="card-body">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-slate-800">
-            Overall Progress
-          </h2>
-          <FiTrendingUp className="text-3xl text-blue-500" />
+    <div className="card-modern p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold text-slate-900">Overall Progress</h2>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-600">
+          <FiTrendingUp className="h-4 w-4" />
+          <span className="text-sm font-semibold">{overallProgress}%</span>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          {/* Overall Percentage */}
-          <div className="rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 p-4 border border-blue-200">
-            <p className="text-sm text-slate-600 mb-1">Overall Completion</p>
-            <p className="text-3xl font-bold text-blue-600">
-              {overallProgress}%
-            </p>
-          </div>
-          {/* Assignments Stats */}
-          <div className="rounded-lg bg-gradient-to-br from-green-50 to-green-100 p-4 border border-green-200">
-            <p className="text-sm text-slate-600 mb-1">Assignments</p>
-            <p className="text-3xl font-bold text-green-600">
-              {stats.completedAssignments}/{stats.totalAssignments}
-            </p>
-            <p className="text-xs text-slate-600 mt-1">Completed</p>
-          </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <StatItem icon={FiTrendingUp} label="Completion" value={`${overallProgress}%`} color="indigo" />
+        <StatItem icon={FiCheckSquare} label="Assignments" value={`${stats.completedAssignments}/${stats.totalAssignments}`} sub="Completed" color="emerald" />
+        <StatItem icon={FiBookOpen} label="Topics" value={`${stats.completedTopics}/${stats.totalTopics}`} sub="Covered" color="violet" />
+        <StatItem icon={FiUsers} label="Enrollments" value={enrollments.length} sub="Active" color="amber" />
+      </div>
 
-          {/* Topics Stats */}
-          <div className="rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 p-4 border border-purple-200">
-            <p className="text-sm text-slate-600 mb-1">Topics</p>
-            <p className="text-3xl font-bold text-purple-600">
-              {stats.completedTopics}/{stats.totalTopics}
-            </p>
-            <p className="text-xs text-slate-600 mt-1">Covered</p>
-          </div>
-
-          {/* Active Enrollments */}
-          <div className="rounded-lg bg-gradient-to-br from-orange-50 to-orange-100 p-4 border border-orange-200">
-            <p className="text-sm text-slate-600 mb-1">Enrollments</p>
-            <p className="text-3xl font-bold text-orange-600">
-              {enrollments.length}
-            </p>
-            <p className="text-xs text-slate-600 mt-1">Active</p>
-          </div>
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Overall completion</span>
+          <span className="text-xs font-semibold text-slate-700">{overallProgress}%</span>
         </div>
-
-        {/* Overall Progress Bar */}
-        <div className="w-full bg-slate-200 rounded-full h-3">
+        <div className="w-full bg-slate-100 rounded-full h-2.5">
           <div
-            className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500"
+            className="bg-indigo-600 h-2.5 rounded-full transition-all duration-700 ease-out"
             style={{ width: `${overallProgress}%` }}
-          ></div>
+          />
         </div>
       </div>
     </div>

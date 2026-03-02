@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { FiBarChart2 } from "react-icons/fi";
 import useAuthContext from "../hooks/useAuthContext";
 import OverallProgressCards from "../components/StudentProgress/OverallProgressCards";
 import EnrollmentProgressCard from "../components/StudentProgress/EnrollmentProgressCard";
+import SectionHeader from "../components/ui/SectionHeader";
+import { StatCardSkeleton } from "../components/ui/Skeleton";
+import EmptyState from "../components/ui/EmptyState";
 
 const StudentProgress = () => {
   const { fetchEnrollments, fetchAssignments, fetchTopics } = useAuthContext();
@@ -18,7 +22,6 @@ const StudentProgress = () => {
     setLoading(true);
     setError("");
     try {
-      // Fetch all enrollments
       const enrollmentsList = await fetchEnrollments();
 
       if (enrollmentsList?.success === false) {
@@ -31,7 +34,6 @@ const StudentProgress = () => {
         : [];
       setEnrollments(validEnrollments);
 
-      // Fetch progress data for each enrollment
       const progress = {};
       for (const enrollment of validEnrollments) {
         const [assignmentsData, topicsData] = await Promise.all([
@@ -44,7 +46,6 @@ const StudentProgress = () => {
           : [];
         const topics = Array.isArray(topicsData) ? topicsData : [];
 
-        // Filter by enrollment ID
         const enrollmentAssignments = assignments.filter(
           (a) => a.enrollment === enrollment.id,
         );
@@ -89,119 +90,100 @@ const StudentProgress = () => {
     }
   };
 
-  // Calculate overall progress
   const calculateOverallProgress = () => {
     if (Object.keys(progressData).length === 0) return 0;
-
     let totalCompletion = 0;
     let enrollmentCount = 0;
-
     Object.values(progressData).forEach((progress) => {
-      const assignmentPercent = progress.assignments.percentage || 0;
-      const topicPercent = progress.topics.percentage || 0;
-      totalCompletion += assignmentPercent + topicPercent;
-      enrollmentCount += 2; // Two metrics per enrollment
+      totalCompletion += (progress.assignments.percentage || 0) + (progress.topics.percentage || 0);
+      enrollmentCount += 2;
     });
-
-    return enrollmentCount > 0
-      ? Math.round(totalCompletion / enrollmentCount)
-      : 0;
+    return enrollmentCount > 0 ? Math.round(totalCompletion / enrollmentCount) : 0;
   };
 
-  // Get performance stats
   const getPerformanceStats = () => {
-    let totalAssignments = 0;
-    let completedAssignments = 0;
-    let totalTopics = 0;
-    let completedTopics = 0;
-
+    let totalAssignments = 0, completedAssignments = 0, totalTopics = 0, completedTopics = 0;
     Object.values(progressData).forEach((progress) => {
       totalAssignments += progress.assignments.total;
       completedAssignments += progress.assignments.completed;
       totalTopics += progress.topics.total;
       completedTopics += progress.topics.completed;
     });
-
-    return {
-      totalAssignments,
-      completedAssignments,
-      totalTopics,
-      completedTopics,
-    };
+    return { totalAssignments, completedAssignments, totalTopics, completedTopics };
   };
 
   const overallProgress = calculateOverallProgress();
   const stats = getPerformanceStats();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-800">Your Progress</h1>
-          <p className="text-slate-600 mt-2">
-            Track your learning progress across all enrollments.
-          </p>
-        </div>
+    <div className="section-container">
+      <SectionHeader
+        title="Your Progress"
+        description="Track your learning progress across all enrollments"
+      />
 
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <span className="loading loading-spinner loading-lg"></span>
-          </div>
-        ) : error ? (
-          <div className="alert alert-error text-sm">{error}</div>
-        ) : (
-          <div className="space-y-6">
-            {/* Overall Progress Card */}
-            <div className="card bg-white border border-slate-200 shadow-sm">
-              <OverallProgressCards
-                overallProgress={overallProgress}
-                stats={stats}
-                enrollments={enrollments}
-              />
+      {loading ? (
+        <div className="space-y-6">
+          <div className="card-modern p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <StatCardSkeleton key={i} />
+              ))}
             </div>
-
-            {/* Enrollment-wise Progress */}
-            {enrollments.length > 0 ? (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-slate-800">
-                  Progress by Enrollment
-                </h2>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {enrollments.map((enrollment) => {
-                    const progress = progressData[enrollment.id];
-                    if (!progress) return null;
-                    return (
-                      <div
-                        key={enrollment.id}
-                        className="card bg-white border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
-                      >
-                        <EnrollmentProgressCard
-                          enrollment={enrollment}
-                          progress={progress}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              <div className="card bg-white border border-slate-200 shadow-sm">
-                <div className="card-body text-center py-12">
-                  <p className="text-slate-600">No active enrollments yet.</p>
-                  <a
-                    href="/dashboard/my-enrollments"
-                    className="link link-primary mt-2"
-                  >
-                    View Enrollments
-                  </a>
-                </div>
-              </div>
-            )}
           </div>
-        )}
-      </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="card-modern p-6">
+                <div className="skeleton-pulse h-5 w-40 rounded mb-4" />
+                <div className="skeleton-pulse h-3 w-full rounded mb-3" />
+                <div className="skeleton-pulse h-3 w-full rounded mb-3" />
+                <div className="skeleton-pulse h-3 w-3/4 rounded" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : error ? (
+        <div className="card-modern p-4 border-red-200 bg-red-50 text-red-700 text-sm">
+          {error}
+        </div>
+      ) : (
+        <div className="space-y-8">
+          <OverallProgressCards
+            overallProgress={overallProgress}
+            stats={stats}
+            enrollments={enrollments}
+          />
+
+          {enrollments.length > 0 ? (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-slate-900">
+                Progress by Enrollment
+              </h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 stagger-children">
+                {enrollments.map((enrollment) => {
+                  const progress = progressData[enrollment.id];
+                  if (!progress) return null;
+                  return (
+                    <EnrollmentProgressCard
+                      key={enrollment.id}
+                      enrollment={enrollment}
+                      progress={progress}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <EmptyState
+              icon={FiBarChart2}
+              title="No enrollments yet"
+              description="Enroll in a tuition to start tracking your progress"
+              actionLabel="Browse Tuitions"
+              actionTo="/tuitions"
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };

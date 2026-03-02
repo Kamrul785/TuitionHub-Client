@@ -2,102 +2,43 @@ import React from "react";
 import { FiUserCheck, FiSend, FiBookOpen, FiUsers } from "react-icons/fi";
 import CountUp from "./CountUp";
 
+const stats = [
+  { icon: FiUserCheck, to: 44886, label: "Registered Tutors", color: "indigo" },
+  { icon: FiSend, to: 57890, label: "Total Applications", color: "emerald" },
+  { icon: FiBookOpen, to: 1946, label: "Live Tuition Jobs", color: "violet" },
+  { icon: FiUsers, to: 367452, label: "Total Stakeholders", color: "amber" },
+];
+
 const State = () => {
   return (
-    <div className="py-12 bg-gradient-to-b from-white to-blue-50">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="group relative overflow-hidden rounded-2xl border border-blue-100 bg-white p-6 shadow-md transition-all hover:-translate-y-1 hover:shadow-xl">
-            <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-blue-200/30 blur-2xl" />
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-blue-600 text-white">
-                <FiUserCheck className="h-5 w-5" />
+    <section className="py-14 bg-slate-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {stats.map(({ icon: Icon, to, label, color }) => (
+            <div
+              key={label}
+              className="card-modern-interactive p-5 sm:p-6 text-center"
+            >
+              <div className={`w-10 h-10 rounded-xl bg-${color}-50 flex items-center justify-center mx-auto mb-3`}>
+                <Icon className={`h-5 w-5 text-${color}-600`} />
               </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-semibold text-gray-900">
-                  <CountUp
-                    from={0}
-                    to={44886}
-                    separator=","
-                    direction="up"
-                    duration={1}
-                    className="count-up-text"
-                    startCounting
-                  />
-                </div>
-                <div className="text-sm text-gray-600">Registered Tutors</div>
+              <div className="text-2xl sm:text-3xl font-bold text-slate-900 tabular-nums">
+                <CountUp
+                  from={0}
+                  to={to}
+                  separator=","
+                  direction="up"
+                  duration={1}
+                  className="count-up-text"
+                  startCounting
+                />
               </div>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">{label}</p>
             </div>
-          </div>
-          <div className="group relative overflow-hidden rounded-2xl border border-emerald-100 bg-white p-6 shadow-md transition-all hover:-translate-y-1 hover:shadow-xl">
-            <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-emerald-200/30 blur-2xl" />
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-emerald-600 text-white">
-                <FiSend className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-semibold text-gray-900">
-                  <CountUp
-                    from={0}
-                    to={57890}
-                    separator=","
-                    direction="up"
-                    duration={1}
-                    className="count-up-text"
-                    startCounting
-                  />
-                </div>
-                <div className="text-sm text-gray-600">Total Applications</div>
-              </div>
-            </div>
-          </div>
-          <div className="group relative overflow-hidden rounded-2xl border border-purple-100 bg-white p-6 shadow-md transition-all hover:-translate-y-1 hover:shadow-xl">
-            <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-purple-200/30 blur-2xl" />
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-purple-600 text-white">
-                <FiBookOpen className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-semibold text-gray-900">
-                  <CountUp
-                    from={0}
-                    to={1946}
-                    separator=","
-                    direction="up"
-                    duration={1}
-                    className="count-up-text"
-                    startCounting
-                  />
-                </div>
-                <div className="text-sm text-gray-600">Live Tuition Jobs</div>
-              </div>
-            </div>
-          </div>
-          <div className="group relative overflow-hidden rounded-2xl border border-orange-100 bg-white p-6 shadow-md transition-all hover:-translate-y-1 hover:shadow-xl">
-            <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-orange-200/30 blur-2xl" />
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-orange-600 text-white">
-                <FiUsers className="h-5 w-5" />
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-semibold text-gray-900">
-                  <CountUp
-                    from={0}
-                    to={367452}
-                    separator=","
-                    direction="up"
-                    duration={1}
-                    className="count-up-text"
-                    startCounting
-                  />
-                </div>
-                <div className="text-sm text-gray-600">Total Stakeholders</div>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

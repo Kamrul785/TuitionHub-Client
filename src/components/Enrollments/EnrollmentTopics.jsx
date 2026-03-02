@@ -1,286 +1,161 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import useAuthContext from "../../hooks/useAuthContext";
+import { useToast } from "../ui/Toast";
+import { TableSkeleton } from "../ui/Skeleton";
+import EmptyState from "../ui/EmptyState";
+import { FiArrowLeft, FiSearch, FiEdit2, FiTrash2, FiBookOpen, FiCheckCircle } from "react-icons/fi";
 
 const EnrollmentTopics = () => {
   const { id } = useParams();
-  const { fetchTopics, createTopic, updateTopic, deleteTopic } =
-    useAuthContext();
+  const { fetchTopics, createTopic, updateTopic, deleteTopic } = useAuthContext();
+  const toast = useToast();
 
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    completed: false,
-  });
+  const [formData, setFormData] = useState({ title: "", description: "", completed: false });
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const loadTopics = async () => {
+    const load = async () => {
       setLoading(true);
       setError("");
       const data = await fetchTopics(id);
-
-      if (data?.success === false) {
-        setError(data.message || "Failed to fetch topics.");
-        setTopics([]);
-      } else {
-        setTopics(Array.isArray(data) ? data : []);
-      }
-
+      if (data?.success === false) { setError(data.message || "Failed to fetch topics."); setTopics([]); }
+      else { setTopics(data?.results || (Array.isArray(data) ? data : [])); }
       setLoading(false);
     };
-
-    if (id) {
-      loadTopics();
-    }
+    if (id) load();
   }, [fetchTopics, id]);
 
   const filteredTopics = useMemo(() => {
-    if (!searchTerm) return topics;
-    const keyword = searchTerm.toLowerCase();
-    return topics.filter((item) => {
-      const title = item.title?.toLowerCase() || "";
-      const description = item.description?.toLowerCase() || "";
-      return title.includes(keyword) || description.includes(keyword);
-    });
-  }, [topics, searchTerm]);
+    // Filter by enrollment ID since the API may return all topics
+    const enrollmentFiltered = topics.filter(
+      (i) => String(i.enrollment) === String(id)
+    );
+    if (!searchTerm) return enrollmentFiltered;
+    const kw = searchTerm.toLowerCase();
+    return enrollmentFiltered.filter((i) => (i.title?.toLowerCase() || "").includes(kw) || (i.description?.toLowerCase() || "").includes(kw));
+  }, [topics, searchTerm, id]);
 
-  const handleChange = (event) => {
-    const { name, value, type, checked } = event.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
   };
 
-  const resetForm = () => {
-    setFormData({ title: "", description: "", completed: false });
-    setEditingId(null);
-  };
+  const resetForm = () => { setFormData({ title: "", description: "", completed: false }); setEditingId(null); };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    if (!formData.title.trim()) {
-      setError("Title is required.");
-      return;
-    }
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.title.trim()) { toast.error("Title is required."); return; }
     setSaving(true);
     setError("");
-
     if (editingId) {
       const updated = await updateTopic(id, editingId, formData);
-      if (updated?.success === false) {
-        setError(updated.message || "Failed to update topic.");
-      } else {
-        setTopics((prev) =>
-          prev.map((item) => (item.id === editingId ? updated : item)),
-        );
-        resetForm();
-      }
+      if (updated?.success === false) { toast.error(updated.message || "Failed to update."); }
+      else { setTopics((prev) => prev.map((i) => (i.id === editingId ? updated : i))); toast.success("Topic updated!"); resetForm(); }
     } else {
       const created = await createTopic(id, formData);
-      if (created?.success === false) {
-        setError(created.message || "Failed to create topic.");
-      } else {
-        setTopics((prev) => [created, ...prev]);
-        resetForm();
-      }
+      if (created?.success === false) { toast.error(created.message || "Failed to create."); }
+      else { setTopics((prev) => [created, ...prev]); toast.success("Topic created!"); resetForm(); }
     }
-
     setSaving(false);
   };
 
-  const handleEdit = (topic) => {
-    setEditingId(topic.id);
-    setFormData({
-      title: topic.title || "",
-      description: topic.description || "",
-      completed: topic.completed || false,
-    });
-  };
+  const handleEdit = (t) => { setEditingId(t.id); setFormData({ title: t.title || "", description: t.description || "", completed: t.completed || false }); };
 
-  const handleDelete = async (topicId) => {
+  const handleDelete = async (tid) => {
     if (!window.confirm("Delete this topic?")) return;
-    const result = await deleteTopic(id, topicId);
-
-    if (result?.success === false) {
-      setError(result.message || "Failed to delete topic.");
-    } else {
-      setTopics((prev) => prev.filter((item) => item.id !== topicId));
-    }
+    const result = await deleteTopic(id, tid);
+    if (result?.success === false) { toast.error(result.message || "Failed to delete."); }
+    else { setTopics((prev) => prev.filter((i) => i.id !== tid)); toast.success("Topic deleted!"); }
   };
 
   const handleToggleComplete = async (topic) => {
-    const updated = await updateTopic(id, topic.id, {
-      completed: !topic.completed,
-    });
-
-    if (updated?.success === false) {
-      setError(updated.message || "Failed to update topic.");
-    } else {
-      setTopics((prev) =>
-        prev.map((item) => (item.id === topic.id ? updated : item)),
-      );
-    }
+    const updated = await updateTopic(id, topic.id, { completed: !topic.completed });
+    if (updated?.success === false) { toast.error(updated.message || "Failed to update."); }
+    else { setTopics((prev) => prev.map((i) => (i.id === topic.id ? updated : i))); }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 p-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-slate-800">Topics</h1>
-          <p className="text-slate-600 mt-1">
-            Create and manage topics for this enrollment.
-          </p>
-        </div>
-
-        <div className="card bg-white border border-slate-200 shadow-sm mb-6">
-          <div className="card-body">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-              <h2 className="text-lg font-semibold text-slate-800">
-                {editingId ? "Edit Topic" : "Add Topic"}
-              </h2>
-              <Link to={`/dashboard/enrollment/${id}`} className="btn btn-ghost">
-                Back to Details
-              </Link>
-            </div>
-
-            {error && <div className="alert alert-error text-sm mb-4">{error}</div>}
-
-            <form onSubmit={handleSubmit} className="grid gap-4">
-              <input
-                type="text"
-                name="title"
-                placeholder="Topic title"
-                className="input input-bordered w-full"
-                value={formData.title}
-                onChange={handleChange}
-                required
-              />
-              <textarea
-                name="description"
-                placeholder="Topic description"
-                className="textarea textarea-bordered w-full"
-                rows={4}
-                value={formData.description}
-                onChange={handleChange}
-              />
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="completed"
-                  className="checkbox"
-                  checked={formData.completed}
-                  onChange={handleChange}
-                />
-                <span className="label-text">Mark as completed</span>
-              </label>
-              <div className="flex flex-wrap gap-2">
-                <button className="btn btn-primary" type="submit" disabled={saving}>
-                  {saving ? "Saving..." : editingId ? "Update Topic" : "Add Topic"}
-                </button>
-                {editingId && (
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    onClick={resetForm}
-                  >
-                    Cancel
-                  </button>
-                )}
-              </div>
-            </form>
+    <div className="section-container">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-2 mb-6">
+          <Link to={`/dashboard/enrollment/${id}`} className="text-slate-400 hover:text-slate-600 transition-colors">
+            <FiArrowLeft className="w-5 h-5" />
+          </Link>
+          <div>
+            <h1 className="text-xl font-bold text-slate-800">Topics</h1>
+            <p className="text-sm text-slate-500">Create and manage topics for this enrollment.</p>
           </div>
         </div>
 
-        <div className="card bg-white border border-slate-200 shadow-sm">
-          <div className="card-body">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-              <h2 className="text-lg font-semibold text-slate-800">
-                Topic List
-              </h2>
-              <input
-                type="text"
-                placeholder="Search topics"
-                className="input input-bordered input-sm w-full md:w-72"
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-              />
+        <div className="card-modern p-6 mb-6">
+          <h2 className="text-sm font-semibold text-slate-700 mb-4">{editingId ? "Edit Topic" : "Add Topic"}</h2>
+          {error && <div className="text-sm text-red-600 bg-red-50 rounded-lg p-3 mb-4">{error}</div>}
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <input type="text" name="title" placeholder="Topic title" className="input input-bordered w-full"
+              value={formData.title} onChange={handleChange} required />
+            <textarea name="description" placeholder="Description (optional)" className="textarea textarea-bordered w-full" rows={3}
+              value={formData.description} onChange={handleChange} />
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-slate-600">
+              <input type="checkbox" name="completed" className="checkbox checkbox-sm" checked={formData.completed} onChange={handleChange} />
+              Mark as completed
+            </label>
+            <div className="flex gap-2">
+              <button type="submit" disabled={saving}
+                className="btn bg-indigo-600 hover:bg-indigo-700 text-white border-none text-sm">
+                {saving ? "Saving..." : editingId ? "Update" : "Add Topic"}
+              </button>
+              {editingId && <button type="button" onClick={resetForm} className="btn btn-ghost text-sm">Cancel</button>}
             </div>
+          </form>
+        </div>
 
-            {loading ? (
-              <div className="flex items-center gap-2 text-slate-600">
-                <span className="loading loading-spinner loading-sm"></span>
-                Loading topics...
+        <div className="card-modern">
+          <div className="p-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-5">
+              <h2 className="text-base font-semibold text-slate-800">Topic List</h2>
+              <div className="relative">
+                <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input type="text" placeholder="Search..." className="input input-bordered input-sm pl-9 w-full md:w-60"
+                  value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
               </div>
-            ) : (
+            </div>
+            {loading ? <TableSkeleton rows={3} cols={3} /> : (
               <div className="overflow-x-auto">
                 <table className="table">
-                  <thead className="bg-slate-50">
-                    <tr>
-                      <th>Title</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
+                  <thead><tr><th>Title</th><th>Status</th><th></th></tr></thead>
                   <tbody>
-                    {filteredTopics.map((topic) => (
-                      <tr key={topic.id} className="hover:bg-slate-50">
+                    {filteredTopics.map((t) => (
+                      <tr key={t.id} className="hover:bg-slate-50/50 transition-colors">
                         <td>
-                          <div className="font-medium text-slate-800">
-                            {topic.title}
-                          </div>
-                          {topic.description && (
-                            <div className="text-sm text-slate-500">
-                              {topic.description}
-                            </div>
-                          )}
+                          <div className="font-medium text-slate-800 text-sm">{t.title}</div>
+                          {t.description && <div className="text-xs text-slate-500 mt-0.5">{t.description}</div>}
                         </td>
                         <td>
-                          <button
-                            className={`badge ${
-                              topic.completed
-                                ? "badge-success"
-                                : "badge-warning"
-                            } cursor-pointer`}
-                            onClick={() => handleToggleComplete(topic)}
-                          >
-                            {topic.completed ? "Completed" : "Pending"}
+                          <button onClick={() => handleToggleComplete(t)}
+                            className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full cursor-pointer transition-colors ${
+                              t.completed ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+                            }`}>
+                            {t.completed && <FiCheckCircle className="w-3 h-3" />}
+                            {t.completed ? "Completed" : "Pending"}
                           </button>
                         </td>
                         <td>
                           <div className="flex gap-2">
-                            <button
-                              className="btn btn-outline btn-xs"
-                              onClick={() => handleEdit(topic)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="btn btn-error btn-xs"
-                              onClick={() => handleDelete(topic.id)}
-                            >
-                              Delete
-                            </button>
+                            <button onClick={() => handleEdit(t)} className="text-slate-400 hover:text-indigo-600 transition-colors"><FiEdit2 className="w-4 h-4" /></button>
+                            <button onClick={() => handleDelete(t.id)} className="text-slate-400 hover:text-red-500 transition-colors"><FiTrash2 className="w-4 h-4" /></button>
                           </div>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-
-                {filteredTopics.length === 0 && (
-                  <div className="text-center text-slate-500 py-6">
-                    No topics found.
-                  </div>
-                )}
+                {filteredTopics.length === 0 && <EmptyState icon={FiBookOpen} title="No topics" description="No topics found." />}
               </div>
             )}
           </div>

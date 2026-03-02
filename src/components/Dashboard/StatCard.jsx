@@ -1,21 +1,18 @@
 import React from "react";
 
-const StatCard = ({icon: Icon, label, value, badge, badgeClass}) => {
+const StatCard = ({ icon: Icon, label, value, badge }) => {
   return (
-    <div
-      key={label}
-      className="card bg-white/90 backdrop-blur shadow-sm border border-slate-200 hover:-translate-y-0.5 transition-transform"
-    >
-      <div className="card-body p-4">
-        <div className="flex items-center gap-2">
-          <Icon className="h-5 w-5 text-primary" />
-          <h3 className="text-sm font-medium">{label}</h3>
+    <div className="card-modern p-5 group">
+      <div className="flex items-center justify-between mb-3">
+        <div className="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+          <Icon className="w-[18px] h-[18px] text-indigo-600" />
         </div>
-        <div className="mt-2 flex items-baseline justify-between">
-          <p className="text-2xl font-bold">{value}</p>
-          <span className={badgeClass}>{badge}</span>
-        </div>
+        <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+          {badge}
+        </span>
       </div>
+      <p className="text-2xl font-bold text-slate-900 tracking-tight">{value}</p>
+      <p className="text-sm text-slate-500 mt-0.5">{label}</p>
     </div>
   );
 };

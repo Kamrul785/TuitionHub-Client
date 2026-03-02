@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import useAuthContext from "../../hooks/useAuthContext";
-import { FiBookOpen, FiArrowLeft, FiCheckCircle, FiAlertCircle, FiInfo } from "react-icons/fi";
+import { FiArrowLeft } from "react-icons/fi";
+import { useToast } from "../ui/Toast";
+import SectionHeader from "../ui/SectionHeader";
 
 const AddTuition = () => {
   const [loading, setLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
   const { createTuition } = useAuthContext();
+  const toast = useToast();
 
   const {
     register,
@@ -33,264 +34,173 @@ const AddTuition = () => {
 
   const onSubmit = async (data) => {
     setLoading(true);
-    setErrorMsg("");
-    setSuccessMsg("");
     try {
       const payload = {
         title: data.title,
         description: data.description,
         class_level: data.class_level,
         subject: data.subject,
-        availability:
-          data.availability === "true" || data.availability === true,
+        availability: data.availability === "true" || data.availability === true,
         is_paid: data.is_paid === "true" || data.is_paid === true,
       };
 
-      // Add price only if it's a paid tuition
       if (payload.is_paid && data.price) {
         payload.price = parseFloat(data.price);
       }
 
       const result = await createTuition(payload);
       if (result?.success) {
-        setSuccessMsg("Tuition posted successfully!");
+        toast.success("Tuition posted successfully!");
         reset();
-        setTimeout(() => {
-          navigate("/dashboard/tuitions");
-        }, 1500);
+        setTimeout(() => navigate("/dashboard/tuitions"), 1500);
       } else {
-        setErrorMsg(result?.message || "Failed to create tuition");
-      }    } catch (error) {
+        toast.error(result?.message || "Failed to create tuition");
+      }
+    } catch (error) {
       const message =
         error.response?.data?.detail ||
-        Object.values(error.response?.data || {})
-          .flat()
-          .join(", ") ||
+        Object.values(error.response?.data || {}).flat().join(", ") ||
         "Failed to create tuition. Please try again.";
-      setErrorMsg(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
   };
 
+  const FieldError = ({ error }) =>
+    error ? <p className="text-xs text-red-500 mt-1.5">{error.message}</p> : null;
+
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => navigate("/dashboard/tuitions")}
-            className="btn btn-ghost btn-sm gap-2 mb-4"
-          >
-            <FiArrowLeft className="h-4 w-4" />
-            Back
-          </button>
-          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-            <div className="p-2 bg-blue-500 rounded-lg">
-              <FiBookOpen className="h-6 w-6 text-white" />
+    <div className="space-y-6">
+      <div>
+        <button
+          onClick={() => navigate("/dashboard/tuitions")}
+          className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-600 transition-colors mb-4"
+        >
+          <FiArrowLeft className="w-4 h-4" />
+          Back to tuitions
+        </button>
+        <SectionHeader
+          title="Add New Tuition"
+          description="Fill in the details to post a new tuition offering."
+        />
+      </div>
+
+      <div className="card-modern max-w-2xl mx-auto">
+        <div className="p-6 md:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Title</label>
+              <input
+                type="text"
+                placeholder="e.g., Physics (Class 10) - Advanced Topics"
+                className="input input-bordered w-full"
+                {...register("title", {
+                  required: "Title is required",
+                  minLength: { value: 5, message: "Title must be at least 5 characters" },
+                })}
+              />
+              <FieldError error={errors.title} />
             </div>
-            Add New Tuition
-          </h1>
-        </div>
 
-        {/* Messages */}
-        {successMsg && (
-          <div className="mb-6 p-4 rounded-lg bg-green-50 border border-green-200 flex items-start gap-3">
-            <FiCheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-            <p className="text-sm text-green-800">{successMsg}</p>
-          </div>
-        )}
-        {errorMsg && (
-          <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
-            <FiAlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
-            <p className="text-sm text-red-800">{errorMsg}</p>
-          </div>
-        )}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
+              <textarea
+                placeholder="Describe your tuition offering..."
+                className="textarea textarea-bordered w-full"
+                rows="4"
+                {...register("description", {
+                  required: "Description is required",
+                  minLength: { value: 20, message: "Description must be at least 20 characters" },
+                })}
+              />
+              <FieldError error={errors.description} />
+            </div>
 
-        {/* Form Card */}
-        <div className="card bg-white shadow-md border border-slate-200">
-          <div className="card-body p-8">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Title */}
-              <div className="form-control w-full">
-                <label className="label pb-2">
-                  <span className="label-text font-semibold text-slate-900">Title</span>
-                </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Class</label>
                 <input
                   type="text"
-                  placeholder="e.g., Physics (Class 10) - Advanced Topics"
-                  className="input input-bordered w-full"
-                  {...register("title", {
-                    required: "Title is required",
-                    minLength: {
-                      value: 5,
-                      message: "Title must be at least 5 characters",
-                    },
-                  })}
-                />
-                {errors.title && (
-                  <label className="label pt-2">
-                    <span className="label-text-alt text-error text-xs">
-                      {errors.title.message}
-                    </span>
-                  </label>
-                )}
-              </div>
-
-              {/* Description */}
-              <div className="form-control w-full">
-                <label className="label pb-2">
-                  <span className="label-text font-semibold text-slate-900">Description</span>
-                </label>
-                <textarea
-                  placeholder="Describe your tuition offering..."
-                  className="textarea textarea-bordered w-full"
-                  rows="5"
-                  {...register("description", {
-                    required: "Description is required",
-                    minLength: {
-                      value: 20,
-                      message: "Description must be at least 20 characters",
-                    },
-                  })}
-                />
-                {errors.description && (
-                  <label className="label pt-2">
-                    <span className="label-text-alt text-error text-xs">
-                      {errors.description.message}
-                    </span>
-                  </label>
-                )}
-              </div>
-
-              {/* Class Level */}
-              <div className="form-control w-full">
-                <label className="label pb-2">
-                  <span className="label-text font-semibold text-slate-900">Class</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., Class 10, Grade 8"
+                  placeholder="e.g., Class 10"
                   className="input input-bordered w-full"
                   {...register("class_level", {
                     required: "Class is required",
-                    minLength: {
-                      value: 2,
-                      message: "Class must be at least 2 characters",
-                    },
+                    minLength: { value: 2, message: "Min 2 characters" },
                   })}
                 />
-                {errors.class_level && (
-                  <label className="label pt-2">
-                    <span className="label-text-alt text-error text-xs">
-                      {errors.class_level.message}
-                    </span>
-                  </label>
-                )}
+                <FieldError error={errors.class_level} />
               </div>
-
-              {/* Subject */}
-              <div className="form-control w-full">
-                <label className="label pb-2">
-                  <span className="label-text font-semibold text-slate-900">Subject</span>
-                </label>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Subject</label>
                 <input
                   type="text"
-                  placeholder="e.g., Mathematics, Physics"
+                  placeholder="e.g., Mathematics"
                   className="input input-bordered w-full"
                   {...register("subject", {
                     required: "Subject is required",
-                    minLength: {
-                      value: 2,
-                      message: "Subject must be at least 2 characters",
-                    },
+                    minLength: { value: 2, message: "Min 2 characters" },
                   })}
                 />
-                {errors.subject && (
-                  <label className="label pt-2">
-                    <span className="label-text-alt text-error text-xs">
-                      {errors.subject.message}
-                    </span>
-                  </label>
-                )}
+                <FieldError error={errors.subject} />
               </div>
+            </div>
 
-              {/* Availability */}
-              <div className="form-control w-full">
-                <label className="label cursor-pointer">
-                  <span className="label-text font-semibold text-slate-900">Available Now</span>
-                  <input
-                    type="checkbox"
-                    className="toggle toggle-primary"
-                    {...register("availability")}
-                    defaultChecked={true}
-                  />
-                </label>
+            <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-lg bg-slate-50 border border-slate-100">
+              <label className="flex items-center gap-3 cursor-pointer flex-1">
+                <input
+                  type="checkbox"
+                  className="toggle toggle-sm border-slate-300 checked:bg-indigo-600 checked:border-indigo-600"
+                  {...register("availability")}
+                  defaultChecked={true}
+                />
+                <span className="text-sm font-medium text-slate-700">Available now</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer flex-1">
+                <input
+                  type="checkbox"
+                  className="toggle toggle-sm border-slate-300 checked:bg-indigo-600 checked:border-indigo-600"
+                  {...register("is_paid")}
+                />
+                <span className="text-sm font-medium text-slate-700">Paid tuition</span>
+              </label>
+            </div>
+
+            {isPaid && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Price (BDT)</label>
+                <input
+                  type="number"
+                  placeholder="e.g., 5000"
+                  className="input input-bordered w-full"
+                  step="0.01"
+                  {...register("price", {
+                    required: isPaid ? "Price is required for paid tuitions" : false,
+                    min: { value: 0, message: "Price must be 0 or greater" },
+                  })}
+                />
+                <FieldError error={errors.price} />
               </div>
+            )}
 
-              {/* Is Paid */}
-              <div className="form-control w-full">
-                <label className="label cursor-pointer">
-                  <span className="label-text font-semibold text-slate-900">This is a Paid Tuition</span>
-                  <input
-                    type="checkbox"
-                    className="toggle toggle-primary"
-                    {...register("is_paid")}
-                  />
-                </label>
-              </div>
-
-              {/* Price - Only show if is_paid is true */}
-              {isPaid && (
-                <div className="form-control w-full">
-                  <label className="label pb-2">
-                    <span className="label-text font-semibold text-slate-900">Price (BDT)</span>
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="e.g., 5000"
-                    className="input input-bordered w-full"
-                    step="0.01"
-                    {...register("price", {
-                      required: isPaid ? "Price is required for paid tuitions" : false,
-                      min: {
-                        value: 0,
-                        message: "Price must be 0 or greater",
-                      },
-                    })}
-                  />
-                  {errors.price && (
-                    <label className="label pt-2">
-                      <span className="label-text-alt text-error text-xs">
-                        {errors.price.message}
-                      </span>
-                    </label>
-                  )}
-                </div>
-              )}
-
-              {/* Buttons */}
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  className="btn btn-primary flex-1"
-                  disabled={loading}
-                >
-                  {loading && (
-                    <span className="loading loading-spinner loading-sm"></span>
-                  )}
-                  {loading ? "Creating..." : "Create Tuition"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate("/dashboard/tuitions")}
-                  className="btn btn-ghost flex-1"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                type="submit"
+                className="btn bg-indigo-600 hover:bg-indigo-700 text-white border-0 flex-1"
+                disabled={loading}
+              >
+                {loading && <span className="loading loading-spinner loading-sm"></span>}
+                {loading ? "Creating..." : "Create Tuition"}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard/tuitions")}
+                className="btn btn-ghost"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

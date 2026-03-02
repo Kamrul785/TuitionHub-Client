@@ -188,10 +188,10 @@ const useAuth = () => {
     localStorage.removeItem("authTokens");
   };
 
-  // Fetch tuitions
-  const fetchTuitions = async () => {
+  // Fetch tuitions (accepts optional URL for pagination)
+  const fetchTuitions = async (url = "/tuitions/") => {
     try {
-      const response = await apiClient.get("/tuitions/");
+      const response = await apiClient.get(url);
       return response.data;
     } catch (error) {
       return handleApiError(

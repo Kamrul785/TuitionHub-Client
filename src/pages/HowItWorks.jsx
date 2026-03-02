@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { FiSearch, FiMessageCircle, FiCheckCircle, FiCalendar, FiBookOpen, FiShield } from "react-icons/fi";
 import { Link } from "react-router";
 
@@ -40,10 +40,10 @@ const benefits = [
 
 const HowItWorks = () => {
   return (
-    <div className="bg-gradient-to-b from-slate-50 via-white to-slate-100">
+    <div className="bg-slate-50">
       <div className="max-w-6xl mx-auto px-4 py-12 md:py-16 space-y-12">
         <header className="space-y-3 text-center">
-          <p className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-primary text-sm font-semibold">
+          <p className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-indigo-600 text-sm font-semibold">
             <FiCheckCircle className="h-4 w-4" /> How it works
           </p>
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900">A clear path from search to success</h1>
@@ -59,7 +59,7 @@ const HowItWorks = () => {
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:-translate-y-1 transition-transform"
             >
               <div className="flex items-center justify-between mb-3">
-                <div className="h-11 w-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                <div className="h-11 w-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
                   <step.icon className="h-5 w-5" />
                 </div>
                 <span className="text-sm text-slate-500">Step {idx + 1}</span>
@@ -79,7 +79,7 @@ const HowItWorks = () => {
             <div className="grid gap-4 sm:grid-cols-2">
               {benefits.map((item) => (
                 <div key={item.title} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                  <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-primary text-xs font-semibold mb-2">
+                  <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-indigo-600 text-xs font-semibold mb-2">
                     <item.icon className="h-4 w-4" />
                     {item.title}
                   </div>
@@ -88,14 +88,14 @@ const HowItWorks = () => {
               ))}
             </div>
           </div>
-          <div className="rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-blue-100 to-white p-6 shadow-sm">
+          <div className="rounded-3xl border border-indigo-100 bg-gradient-to-br from-primary/10 via-indigo-50 to-white p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-900 mb-3">Ready to begin?</h3>
             <p className="text-sm text-slate-700 mb-4">
               Browse tutors by subject and schedule your first session today. You can always message tutors before you book.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link to="/tuitions" className="btn btn-primary btn-sm">Browse Tuitions</Link>
-              <Link to="/register" className="btn btn-outline btn-sm">Register</Link>
+              <Link to="/tuitions" className="btn bg-indigo-600 hover:bg-indigo-700 text-white border-none btn-sm">Browse Tuitions</Link>
+              <Link to="/register" className="btn btn-ghost border border-slate-200 btn-sm">Register</Link>
             </div>
           </div>
         </section>
@@ -115,3 +115,4 @@ const LinkButton = ({ to, label, variant }) => {
 };
 
 export default HowItWorks;
+

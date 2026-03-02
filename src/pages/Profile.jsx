@@ -5,12 +5,14 @@ import { useEffect, useState } from "react";
 import useAuthContext from "../hooks/useAuthContext";
 import ProfileButton from "../components/Dashboard/Profile/ProfileButton";
 import PasswordChangeForm from "../components/Dashboard/Profile/PasswordChangeForm";
+import SectionHeader from "../components/ui/SectionHeader";
+import { useToast } from "../components/ui/Toast";
 
 const Profile = () => {
-  const { user, updateUserProfile, changePassword, errorMsg, successMsg } =
-    useAuthContext();
+  const { user, updateUserProfile, changePassword } = useAuthContext();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
 
   const {
     register,
@@ -26,7 +28,6 @@ const Profile = () => {
 
   const onSubmit = async (data) => {
     try {
-      // profile update
       setIsLoading(true);
       const profilePayload = {
         first_name: data.first_name,
@@ -35,63 +36,63 @@ const Profile = () => {
         address: data.address,
       };
       await updateUserProfile(profilePayload);
-      // change password
+      toast.success("Profile updated successfully!");
+
       if (data.current_password && data.new_password) {
         await changePassword({
           current_password: data.current_password,
           new_password: data.new_password,
         });
+        toast.success("Password changed successfully!");
       }
+      setIsEditing(false);
     } catch (error) {
-      console.log(error);
+      toast.error(error?.message || "Failed to update profile.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-slate-50 via-white to-slate-50 p-6">
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        {/* Page Header */}
-        {errorMsg && (
-          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
-            {errorMsg}
+    <div className="section-container">
+      <div className="max-w-3xl mx-auto">
+        <SectionHeader
+          title="Personal Information"
+          description="Manage your personal information and account settings"
+        />
+
+        <div className="card-modern p-6 sm:p-8">
+          <div className="flex items-center gap-4 mb-8 pb-6 border-b border-slate-100">
+            <div className="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center">
+              <FiUser className="w-6 h-6 text-indigo-600" />
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-slate-800">
+                {user?.first_name} {user?.last_name}
+              </p>
+              <p className="text-sm text-slate-500">{user?.email}</p>
+            </div>
           </div>
-        )}
-        {successMsg && (
-          <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
-            {successMsg}
-          </div>
-        )}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-800">
-            Personal Information
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Manage your personal information and account settings
-          </p>
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <ProfileForm
+              register={register}
+              errors={errors}
+              isEditing={isEditing}
+            />
+            <PasswordChangeForm
+              register={register}
+              errors={errors}
+              isEditing={isEditing}
+              watch={watch}
+            />
+            <ProfileButton
+              isEditing={isEditing}
+              setIsEditing={setIsEditing}
+              isLoading={isLoading}
+            />
+          </form>
         </div>
-
-        {/* Profile Information Card */}
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <ProfileForm
-            register={register}
-            errors={errors}
-            isEditing={isEditing}
-          />
-          <PasswordChangeForm
-            register={register}
-            errors={errors}
-            isEditing={isEditing}
-            watch={watch}
-          />
-
-          <ProfileButton
-            isEditing={isEditing}
-            setIsEditing={setIsEditing}
-            isLoading={isLoading}
-          />
-        </form>
       </div>
     </div>
   );
