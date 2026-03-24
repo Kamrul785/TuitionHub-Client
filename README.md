@@ -136,6 +136,16 @@ The system is designed with scalability in mind, including a placeholder archite
 | `react-icons` | ^5.5.0 | Icon library |
 | `ogl` | ^1.0.11 | WebGL/3D graphics utility |
 
+### Backend
+
+| Technology | Purpose |
+|---|---|
+| Django | Backend web framework |
+| Django REST Framework (DRF) | REST API development |
+| Supabase (PostgreSQL) | Database and hosted backend services |
+| JWT | Token-based authentication |
+| Swagger / OpenAPI | API documentation |
+
 
 ### DevOps & Tooling
 
